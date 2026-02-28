@@ -1,4 +1,4 @@
-# gps-logistic-tracker
+# gps-logistics-tracker
  A real-time parcel tracking backend
 
 
