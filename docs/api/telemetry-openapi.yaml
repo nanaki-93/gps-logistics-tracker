@@ -1,0 +1,104 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Go Telemetry Service
+servers:
+  - url: http://localhost:8080
+    description: Local Development
+  - url: https://telemetry.aki.internal
+    description: Production (placeholder)
+paths:
+  /api/v1/telemetry:
+    post:
+      summary: Submit a GPS ping from a delivery driver
+      operationId: ingestGpsEvent
+      tags:
+        - telemetry
+      security:
+       - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GpsEvent'
+            example:
+              driver_uid: "550e8400-e29b-41d4-a716-446655440000"
+              lat: 35.6895
+              lng: 139.6917
+              event_timestamp: "2026-10-14T08:30:00Z"
+      responses:
+        "202":
+          description: Event queued for processing. Does NOT guarantee persistence.
+        "400":
+          description: Malformed JSON. Cannot parse request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: >
+            Semantic Validation failed. Possible reasons: driver_uid not valid UUID v4.
+            lat/lng outside min or max.
+            timestamp more thant 60 second in the future.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "429":
+          description: Rate limited exceeded. IP has sent more than 50 requests/second.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "503":
+          description: Worker channel is full (capacity 10_000). Retry with backoff.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: >
+        Static API key assigned per fleet operator.
+  schemas:
+    GpsEvent:
+      type: object
+      required:
+        - driver_uid
+        - latitude
+        - longitude
+        - event_timestamp
+      properties:
+        driver_uid:
+          type: string
+          format: uuid
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        ping_timestamp:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
