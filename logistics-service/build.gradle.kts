@@ -6,9 +6,10 @@ plugins {
 	id("org.hibernate.orm") version "7.2.4.Final"
 	id("org.graalvm.buildtools.native") version "0.11.4"
 	kotlin("plugin.jpa") version "2.2.21"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 }
 
-group = "com.github.nanaki-93"
+group = "com.github.nanaki93"
 version = "0.0.1-SNAPSHOT"
 description = "Kotlin Spring boot module of gps-logistics-tracker"
 
@@ -63,4 +64,14 @@ allOpen {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+ktlint {
+    version.set("1.4.1")
+    android.set(false)
+    outputToConsole.set(true)    // shows violations directly in the CI log
+    filter {
+        exclude("**/generated/**")
+        exclude("**/*.gradle.kts")
+    }
 }
