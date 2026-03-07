@@ -61,8 +61,8 @@ jobs:
       # Pull the Ollama model image ahead of time so Testcontainers
       # doesn't time out waiting for the model download during tests.
       # The image is cached by Docker layer caching between runs.
-      - name: Pre-pull Ollama image
-        run: docker pull ollama/ollama:latest
+#      - name: Pre-pull Ollama image
+#        run: docker pull ollama/ollama:latest
 
       - name: Run tests
         env:
