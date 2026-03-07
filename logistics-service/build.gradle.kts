@@ -1,12 +1,13 @@
 plugins {
-	kotlin("jvm") version "2.2.21"
-	kotlin("plugin.spring") version "2.2.21"
+	kotlin("jvm") version "2.2.20"
+	kotlin("plugin.spring") version "2.2.20"
 	id("org.springframework.boot") version "4.0.3"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.hibernate.orm") version "7.2.4.Final"
 	id("org.graalvm.buildtools.native") version "0.11.4"
-	kotlin("plugin.jpa") version "2.2.21"
+	kotlin("plugin.jpa") version "2.2.20"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+	jacoco
 }
 
 group = "com.github.nanaki93"
@@ -69,7 +70,7 @@ tasks.withType<Test> {
 ktlint {
     version.set("1.4.1")
     android.set(false)
-    outputToConsole.set(true)    // shows violations directly in the CI log
+    outputToConsole.set(true)
     filter {
         exclude("**/generated/**")
         exclude("**/*.gradle.kts")
