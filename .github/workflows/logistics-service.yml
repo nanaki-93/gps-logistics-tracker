@@ -74,7 +74,7 @@ jobs:
 
       - name: Publish test results
         uses: dorny/test-reporter@v1
-        if: always()   # run even if tests fail so you can see the report
+        if: always() && hashFiles('logistics-service/build/test-results/test/*.xml') != ''
         with:
           name: Kotlin Test Results
           path: logistics-service/build/test-results/test/*.xml
