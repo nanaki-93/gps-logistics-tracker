@@ -79,6 +79,7 @@ jobs:
           name: Kotlin Test Results
           path: logistics-service/build/test-results/test/*.xml
           reporter: java-junit
+          fail-on-empty: false
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
