@@ -1,0 +1,10 @@
+###
+POST http://localhost:8080/vehicle
+Content-Type: application/json
+
+{
+    "vehicleUid": "5254e24d-f80a-4bd2-8f25-21af1e1e1366",
+    "plateNumber": "Camry",
+    "model": "Toyota Camry",
+  "active": false
+}
