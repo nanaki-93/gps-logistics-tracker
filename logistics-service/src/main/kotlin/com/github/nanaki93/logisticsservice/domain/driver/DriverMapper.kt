@@ -7,10 +7,10 @@ import java.util.UUID
 object DriverMapper {
     fun toDto(
         driver: Driver,
-        vehicle: Vehicle,
+        vehicle: Vehicle? = null,
     ): DriverDto =
         DriverDto(
-            vechicle = VehicleMapper.toDto(vehicle),
+            vechicle = vehicle?.let { VehicleMapper.toDto(it) },
             fullName = driver.fullName,
             email = driver.email,
             phone = driver.phone,
@@ -19,7 +19,7 @@ object DriverMapper {
 
     fun toEntity(
         driverDto: DriverDto,
-        vehicleUid: UUID,
+        vehicleUid: UUID? = null,
     ): Driver =
         Driver(
             vehicleUid = vehicleUid,

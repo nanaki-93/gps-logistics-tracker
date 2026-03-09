@@ -3,7 +3,7 @@ package com.github.nanaki93.logisticsservice.domain.parcel
 import com.github.nanaki93.logisticsservice.domain.address.AddressDto
 import com.github.nanaki93.logisticsservice.domain.driver.DriverDto
 import com.github.nanaki93.logisticsservice.domain.route.RouteDto
-import java.util.UUID
+import com.github.nanaki93.logisticsservice.domain.util.toUuid
 
 object ParcelMapper {
     fun toDto(
@@ -24,21 +24,12 @@ object ParcelMapper {
             dropoffTime = parcel.dropoffTime,
         )
 
-    fun toEntity(
-        parcelDto: ParcelDto,
-        routeUid: UUID,
-        driverUid: UUID?,
-        senderUid: UUID,
-        receiverUid: UUID,
-    ): Parcel =
+    fun toEntity(parcelDto: ParcelInsertDto): Parcel =
         Parcel(
-            routeUid = routeUid,
-            driverUid = driverUid,
-            senderUid = senderUid,
-            receiverUid = receiverUid,
+            routeUid = parcelDto.routeUid.toUuid(),
+            senderUid = parcelDto.senderUid.toUuid(),
+            receiverUid = parcelDto.receiverUid.toUuid(),
             trackingCode = parcelDto.trackingCode,
             status = parcelDto.status,
-            pickupTime = parcelDto.pickupTime,
-            dropoffTime = parcelDto.dropoffTime,
         )
 }

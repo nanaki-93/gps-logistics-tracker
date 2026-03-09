@@ -2,6 +2,7 @@ package com.github.nanaki93.logisticsservice.domain.address
 
 import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toCoordinates
 import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toCoordinatesDto
+import java.util.UUID
 
 object AddressMapper {
     fun toDto(address: Address): AddressDto =
@@ -15,8 +16,12 @@ object AddressMapper {
             details = address.details,
         )
 
-    fun toEntity(addressDto: AddressDto): Address =
+    fun toEntity(
+        addressDto: AddressDto,
+        uid: UUID? = null,
+    ): Address =
         Address(
+            addressUid = uid ?: UUID.randomUUID(),
             fullName = addressDto.fullName,
             coordinates = addressDto.coordinates.toCoordinates(),
             street = addressDto.street,

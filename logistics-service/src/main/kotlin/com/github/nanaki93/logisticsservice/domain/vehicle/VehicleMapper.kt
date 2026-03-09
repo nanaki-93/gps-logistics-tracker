@@ -6,7 +6,6 @@ object VehicleMapper {
             plateNumber = vehicle.plateNumber,
             model = vehicle.model,
             type = vehicle.type,
-            active = vehicle.active,
         )
 
     fun toEntity(vehicleDto: VehicleDto): Vehicle =
@@ -14,6 +13,5 @@ object VehicleMapper {
             plateNumber = vehicleDto.plateNumber,
             model = vehicleDto.model,
             type = vehicleDto.type,
-            active = vehicleDto.active,
         )
 }

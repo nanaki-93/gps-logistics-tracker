@@ -12,6 +12,14 @@ data class ParcelDto(
     val sender: AddressDto,
     val receiver: AddressDto,
     val status: ParcelStatus,
-    val pickupTime: Instant,
-    val dropoffTime: Instant,
+    val pickupTime: Instant?,
+    val dropoffTime: Instant?,
+)
+
+data class ParcelInsertDto(
+    val routeUid: String,
+    val trackingCode: String,
+    val senderUid: String,
+    val receiverUid: String,
+    val status: ParcelStatus,
 )

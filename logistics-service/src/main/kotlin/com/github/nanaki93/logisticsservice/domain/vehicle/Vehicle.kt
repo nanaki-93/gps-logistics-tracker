@@ -16,5 +16,23 @@ class Vehicle(
     val model: String?,
     @Enumerated(EnumType.STRING)
     val type: VehicleType,
-    val active: Boolean,
-)
+    val active: Boolean = true,
+) {
+    fun activate() =
+        Vehicle(
+            vehicleUid = vehicleUid,
+            plateNumber = plateNumber,
+            model = model,
+            type = type,
+            active = true,
+        )
+
+    fun deactivate() =
+        Vehicle(
+            vehicleUid = vehicleUid,
+            plateNumber = plateNumber,
+            model = model,
+            type = type,
+            active = false,
+        )
+}

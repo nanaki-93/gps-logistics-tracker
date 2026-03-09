@@ -8,5 +8,14 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  data:
+    redis:
+      host: redis       # service name in docker-compose
+      port: 6379
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000   # 5 minutes in milliseconds
 server:
   port: 8080
+

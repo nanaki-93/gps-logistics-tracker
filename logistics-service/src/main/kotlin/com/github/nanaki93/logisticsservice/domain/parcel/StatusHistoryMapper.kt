@@ -1,6 +1,6 @@
 package com.github.nanaki93.logisticsservice.domain.parcel
 
-import java.util.UUID
+import com.github.nanaki93.logisticsservice.domain.util.toUuid
 
 object StatusHistoryMapper {
     fun toDto(
@@ -16,12 +16,9 @@ object StatusHistoryMapper {
             reason = statusHistory.reason,
         )
 
-    fun toEntity(
-        statusHistoryDto: StatusHistoryDto,
-        parcelUid: UUID,
-    ): StatusHistory =
+    fun toEntity(statusHistoryDto: StatusHistoryInsertDto): StatusHistory =
         StatusHistory(
-            parcelUid = parcelUid,
+            parcelUid = statusHistoryDto.parcelId.toUuid(),
             status = statusHistoryDto.status,
             oldStatus = statusHistoryDto.oldStatus,
             tsFrom = statusHistoryDto.tsFrom,

@@ -17,8 +17,19 @@ class StatusHistory(
     @Enumerated(EnumType.STRING)
     val status: ParcelStatus,
     @Enumerated(EnumType.STRING)
-    val oldStatus: ParcelStatus?,
+    val oldStatus: ParcelStatus? = null,
     val tsFrom: Instant,
-    val tsTo: Instant,
-    val reason: String,
-)
+    val tsTo: Instant? = null,
+    val reason: String? = null,
+) {
+    fun close() =
+        StatusHistory(
+            statusHistoryUid = statusHistoryUid,
+            parcelUid = parcelUid,
+            status = status,
+            oldStatus = status,
+            tsFrom = tsFrom,
+            tsTo = Instant.now(),
+            reason = reason,
+        )
+}

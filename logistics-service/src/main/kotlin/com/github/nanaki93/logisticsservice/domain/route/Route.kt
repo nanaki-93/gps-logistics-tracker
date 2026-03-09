@@ -17,5 +17,12 @@ class Route(
     val destinationUid: UUID,
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    val waypoints: Map<String, Any>,
+    val waypoints: List<Waypoint>,
+)
+
+data class Waypoint(
+    val order: Int,
+    val lng: Double,
+    val lat: Double,
+    val label: String? = null,
 )

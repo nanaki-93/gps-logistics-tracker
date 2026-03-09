@@ -7,6 +7,15 @@ data class StatusHistoryDto(
     val status: ParcelStatus,
     val oldStatus: ParcelStatus?,
     val tsFrom: Instant,
-    val tsTo: Instant,
-    val reason: String,
+    val tsTo: Instant?,
+    val reason: String?,
+)
+
+data class StatusHistoryInsertDto(
+    val parcelId: String,
+    val status: ParcelStatus,
+    val oldStatus: ParcelStatus?,
+    val tsFrom: Instant,
+    val tsTo: Instant?,
+    val reason: String?,
 )

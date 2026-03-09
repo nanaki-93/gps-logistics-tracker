@@ -4,5 +4,4 @@ data class VehicleDto(
     val plateNumber: String,
     val model: String?,
     val type: VehicleType,
-    val active: Boolean,
 )
