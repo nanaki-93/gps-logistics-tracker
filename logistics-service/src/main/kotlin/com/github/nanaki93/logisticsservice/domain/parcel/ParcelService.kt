@@ -5,6 +5,7 @@ import com.github.nanaki93.logisticsservice.domain.driver.DriverService
 import com.github.nanaki93.logisticsservice.domain.route.RouteService
 import com.github.nanaki93.logisticsservice.domain.util.toUuid
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class ParcelService(
@@ -25,5 +26,11 @@ class ParcelService(
         val parcel = ParcelMapper.toEntity(parcelDto)
         parcelRepository.save(parcel)
         statusHistoryService.createHistory(parcel)
+    }
+
+    fun assign(
+        parcelUid: UUID,
+        driverUid: UUID,
+    ) {
     }
 }

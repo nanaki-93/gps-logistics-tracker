@@ -1,11 +1,18 @@
 package com.github.nanaki93.logisticsservice.domain.telemetryevent
 
+import com.github.nanaki93.logisticsservice.domain.driver.DriverDto
 import com.github.nanaki93.logisticsservice.domain.util.CoordinatesDto
-import com.github.nanaki93.logisticsservice.domain.vehicle.VehicleDto
 import java.time.Instant
 
 data class TelemetryEventDto(
-    val vehicle: VehicleDto,
+    val driver: DriverDto,
     val coordinates: CoordinatesDto,
+    val recordedAt: Instant,
+)
+
+data class TelemetryEventInsertDto(
+    val driverUid: String,
+    val longitude: Double,
+    val latitude: Double,
     val recordedAt: Instant,
 )

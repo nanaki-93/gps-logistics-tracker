@@ -12,7 +12,7 @@ import java.util.UUID
 class TelemetryEvent(
     @Id
     val telemetryEventUid: UUID = UUID.randomUUID(),
-    val vehicleUid: UUID,
+    val driverUid: UUID,
     @Column(columnDefinition = "geography(POINT,4326)")
     val coordinates: String,
     val recordedAt: Instant,

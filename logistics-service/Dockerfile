@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copy dependency files first — Docker caches this layer
 # and only re-downloads dependencies when build files change
-COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+COPY build.gradle.kts settings.gradle.kts ./
 COPY gradle ./gradle
 RUN gradle dependencies --no-daemon
 

@@ -1,6 +1,11 @@
 spring:
   application:
     name: logistics-service
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:admin}
+    password: ${RABBITMQ_PASSWORD:password}
   jpa:
     database: POSTGRESQL
   datasource:
@@ -16,6 +21,11 @@ spring:
     type: redis
     redis:
       time-to-live: 300000   # 5 minutes in milliseconds
+rabbitmq:
+  exchange: telemtry.exchange
+  queue: telemetry.queue
+  routing-key: telemetry.#
+  dlq: telemetry.dlq
 server:
   port: 8080
 
