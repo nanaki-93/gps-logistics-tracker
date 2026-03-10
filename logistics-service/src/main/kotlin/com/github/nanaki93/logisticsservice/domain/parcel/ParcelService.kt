@@ -3,6 +3,7 @@ package com.github.nanaki93.logisticsservice.domain.parcel
 import com.github.nanaki93.logisticsservice.domain.address.AddressService
 import com.github.nanaki93.logisticsservice.domain.driver.DriverService
 import com.github.nanaki93.logisticsservice.domain.route.RouteService
+import com.github.nanaki93.logisticsservice.domain.telemetryevent.TelemetryEventInsertDto
 import com.github.nanaki93.logisticsservice.domain.util.toUuid
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -32,5 +33,13 @@ class ParcelService(
         parcelUid: UUID,
         driverUid: UUID,
     ) {
+    }
+
+    fun evaluateAll(event: TelemetryEventInsertDto) {
+        val parcels = parcelRepository.findByDriverUid(event.driverUid.toUuid())
+        // calculate deviation
+        parcels.forEach { parcel ->
+            val deviation = routeService.getDeviation(parcel.routeUid, event.lng, event.lat)
+        }
     }
 }

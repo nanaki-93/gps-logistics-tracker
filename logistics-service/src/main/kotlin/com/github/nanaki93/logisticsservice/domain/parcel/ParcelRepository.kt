@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface ParcelRepository : JpaRepository<Parcel, UUID>
+interface ParcelRepository : JpaRepository<Parcel, UUID> {
+    fun findByDriverUid(driverUid: UUID): List<Parcel>
+}

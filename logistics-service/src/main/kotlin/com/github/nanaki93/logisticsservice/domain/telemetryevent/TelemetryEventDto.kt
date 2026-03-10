@@ -12,7 +12,7 @@ data class TelemetryEventDto(
 
 data class TelemetryEventInsertDto(
     val driverUid: String,
-    val longitude: Double,
-    val latitude: Double,
+    val lng: Double,
+    val lat: Double,
     val recordedAt: Instant,
 )

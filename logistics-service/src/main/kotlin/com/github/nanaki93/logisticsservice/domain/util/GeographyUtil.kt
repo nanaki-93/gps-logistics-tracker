@@ -21,4 +21,6 @@ object GeographyUtil {
     fun String.toCoordinatesDto() = fromWkt(this)
 
     fun Pair<Double, Double>.toCoordinatesDto() = CoordinatesDto(first, second)
+
+    fun Pair<Double, Double>.toCoordinates() = toWkt(CoordinatesDto(first, second))
 }
