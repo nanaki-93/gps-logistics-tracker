@@ -303,7 +303,6 @@ secrets/
 *.pgsql
 
 # Database dumps
-*.sql
 *.dump
 
 # ============================================
