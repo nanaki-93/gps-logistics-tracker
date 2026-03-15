@@ -9,7 +9,7 @@ class TelemtryEventConsumer(
     private val telemetryEventService: TelemetryEventService,
 ) {
     @RabbitListener(queues = [$$"${rabbitmq.queue}"])
-    fun consumeTelemetryEvent(event: TelemetryEventInsertDto) {
+    fun consumeTelemetryEvent(event: TelemetryEventPlainDto) {
         try {
             telemetryEventService.processTelemetryEvent(event)
         } catch (e: Exception) {

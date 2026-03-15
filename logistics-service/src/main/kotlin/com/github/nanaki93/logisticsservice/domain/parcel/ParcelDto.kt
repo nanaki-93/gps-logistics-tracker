@@ -23,3 +23,8 @@ data class ParcelInsertDto(
     val receiverUid: String,
     val status: ParcelStatus,
 )
+
+data class ParcelAssignDto(
+    val parcelUid: String,
+    val driverUid: String,
+)

@@ -13,7 +13,7 @@ class DriverService(
         driverRepository.save(DriverMapper.toEntity(driverDto))
     }
 
-    fun getById(uid: UUID): DriverDto? {
+    fun getByUId(uid: UUID): DriverDto {
         val driver = driverRepository.findById(uid).orElseThrow { IllegalArgumentException("Driver not found") }
         val vehicle =
             driver.vehicleUid.let {

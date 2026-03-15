@@ -9,13 +9,13 @@ object ParcelMapper {
     fun toDto(
         parcel: Parcel,
         route: RouteDto,
-        driverDto: DriverDto,
+        driver: DriverDto?,
         sender: AddressDto,
         receiver: AddressDto,
     ): ParcelDto =
         ParcelDto(
             route = route,
-            driver = driverDto,
+            driver = driver,
             trackingCode = parcel.trackingCode,
             sender = sender,
             receiver = receiver,
@@ -24,9 +24,18 @@ object ParcelMapper {
             dropoffTime = parcel.dropoffTime,
         )
 
-    fun toEntity(parcelDto: ParcelInsertDto): Parcel =
+    fun toInsertEntity(parcelDto: ParcelInsertDto): Parcel =
         Parcel(
             routeUid = parcelDto.routeUid.toUuid(),
+            senderUid = parcelDto.senderUid.toUuid(),
+            receiverUid = parcelDto.receiverUid.toUuid(),
+            trackingCode = parcelDto.trackingCode,
+            status = parcelDto.status,
+        )
+
+    fun toEntity(parcelDto: ParcelDto): Parcel =
+        Parcel(
+            routeUid = parcelDto.route..toUuid(),
             senderUid = parcelDto.senderUid.toUuid(),
             receiverUid = parcelDto.receiverUid.toUuid(),
             trackingCode = parcelDto.trackingCode,

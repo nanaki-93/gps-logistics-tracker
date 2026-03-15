@@ -15,8 +15,10 @@ spring:
     driver-class-name: org.postgresql.Driver
   data:
     redis:
-      host: redis       # service name in docker-compose
+      host: localhost       # service name in docker-compose
       port: 6379
+      timeout: 10000
+      password: yourpassword
   cache:
     type: redis
     redis:

@@ -22,4 +22,30 @@ class Parcel(
     val status: ParcelStatus,
     val pickupTime: Instant? = null,
     val dropoffTime: Instant? = null,
-)
+) {
+    fun assign(driverUid: UUID) =
+        Parcel(
+            parcelUid = parcelUid,
+            routeUid = routeUid,
+            driverUid = driverUid,
+            trackingCode = trackingCode,
+            senderUid = senderUid,
+            receiverUid = receiverUid,
+            status = status,
+            pickupTime = pickupTime,
+            dropoffTime = dropoffTime,
+        )
+
+    fun unassign() =
+
+        Parcel(
+            parcelUid = parcelUid,
+            routeUid = routeUid,
+            trackingCode = trackingCode,
+            senderUid = senderUid,
+            receiverUid = receiverUid,
+            status = status,
+            pickupTime = pickupTime,
+            dropoffTime = dropoffTime,
+        )
+}

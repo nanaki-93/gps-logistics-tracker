@@ -1,15 +1,19 @@
 package com.github.nanaki93.logisticsservice.domain.vehicle
 
+import com.github.nanaki93.logisticsservice.domain.driver.DriverService
+import com.github.nanaki93.logisticsservice.domain.util.toUuid
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class VehicleService(
     val vehicleRepository: VehicleRepository,
+    val driverService: DriverService,
 ) {
-    fun register(vehicleDto: VehicleDto): VehicleDto {
+    fun create(vehicleDto: VehicleDto): VehicleDto {
         val vehicle = VehicleMapper.toEntity(vehicleDto)
         val savedVehicle = vehicleRepository.save(vehicle)
+        if (vehicleDto.driverUid != null) driverService.assignVehicle(savedVehicle.vehicleUid, vehicleDto.driverUid.toUuid())
         return VehicleMapper.toDto(savedVehicle)
     }
 

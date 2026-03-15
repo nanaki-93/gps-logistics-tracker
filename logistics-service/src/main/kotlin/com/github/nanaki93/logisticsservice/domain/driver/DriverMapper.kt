@@ -10,8 +10,8 @@ object DriverMapper {
         vehicle: Vehicle? = null,
     ): DriverDto =
         DriverDto(
-            vechicle = vehicle?.let { VehicleMapper.toDto(it) },
-            fullName = driver.fullName,
+            vehicle = vehicle?.let { VehicleMapper.toDto(it) },
+            fullName = driver.fullname,
             email = driver.email,
             phone = driver.phone,
             licenseNumber = driver.licenseNumber,
@@ -23,7 +23,7 @@ object DriverMapper {
     ): Driver =
         Driver(
             vehicleUid = vehicleUid,
-            fullName = driverDto.fullName,
+            fullname = driverDto.fullName,
             email = driverDto.email,
             phone = driverDto.phone,
             licenseNumber = driverDto.licenseNumber,

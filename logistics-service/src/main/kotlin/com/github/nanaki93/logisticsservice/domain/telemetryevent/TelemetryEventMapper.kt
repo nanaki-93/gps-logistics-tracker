@@ -16,7 +16,7 @@ object TelemetryEventMapper {
             recordedAt = telemetryEvent.recordedAt,
         )
 
-    fun toEntity(telemetryEventDto: TelemetryEventInsertDto): TelemetryEvent =
+    fun toEntity(telemetryEventDto: TelemetryEventPlainDto): TelemetryEvent =
         TelemetryEvent(
             driverUid = telemetryEventDto.driverUid.toUuid(),
             coordinates = Pair(telemetryEventDto.lng, telemetryEventDto.lat).toCoordinates(),

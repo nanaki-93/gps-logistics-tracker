@@ -9,18 +9,18 @@ import java.util.UUID
 @Table(name = "driver")
 class Driver(
     @Id
-    val uuid: UUID = UUID.randomUUID(),
+    val driverUid: UUID = UUID.randomUUID(),
     val vehicleUid: UUID? = null,
-    val fullName: String,
+    val fullname: String,
     val email: String,
     val phone: String,
     val licenseNumber: String,
 ) {
     fun assign(vehicleUid: UUID) =
         Driver(
-            uuid = uuid,
+            driverUid = driverUid,
             vehicleUid = vehicleUid,
-            fullName = fullName,
+            fullname = fullname,
             email = email,
             phone = phone,
             licenseNumber = licenseNumber,
@@ -28,8 +28,8 @@ class Driver(
 
     fun unassign() =
         Driver(
-            uuid = uuid,
-            fullName = fullName,
+            driverUid = driverUid,
+            fullname = fullname,
             email = email,
             phone = phone,
             licenseNumber = licenseNumber,
