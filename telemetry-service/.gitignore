@@ -1,0 +1,51 @@
+# Binaries
+bin/
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test / coverage outputs
+*.test
+*.out
+coverage.*
+cover.out
+
+# Go workspace / dependency cache
+go.work
+go.work.sum
+
+# Vendor directory (uncomment if you don't commit vendor)
+# vendor/
+
+# IDE/editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Local config / generated files
+config/local*.yaml
+config/local*.yml
+config/*.local.yaml
+config/*.local.yml
