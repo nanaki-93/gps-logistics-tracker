@@ -1,6 +1,7 @@
 services:
   logistics-db:
     image: postgis/postgis:15-3.3
+    platform: linux/amd64
     container_name: logistics-db
     environment:
       POSTGRES_USER: postgres
@@ -10,6 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+
   logistics-cache:
     image: redis:7.2.6-alpine
     container_name: logistics-cache
@@ -18,6 +20,7 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass yourpassword
     volumes:
         - cache-data:/data
+
   telemetry-mw-rabbitmq:
     image: rabbitmq:3.9.14-management-alpine
     container_name: telemetry-mw-rabbitmq
@@ -34,7 +37,61 @@ services:
     volumes:
       - rabbitmq-lib:/var/lib/rabbitmq
       - rabbitmq-log:/var/log/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
+  telemetry-service:
+    build:
+      context: ./telemetry-service
+      dockerfile: Dockerfile
+    container_name: telemetry-service
+    depends_on:
+      telemetry-mw-rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8090:8090"
+    environment:
+      PORT: 8090
+      RABBITMQ_URL: amqp://admin:password@telemetry-mw-rabbitmq:5672/
+      RABBITMQ_EXCHANGE: telemetry.exchange
+      RABBITMQ_ROUTING_KEY: telemetry.#
+      WORKER_COUNT: 10
+      CHANNEL_BUFFER: 1000
+      RATE_LIMIT_RPS: 50
+      API_KEYS: key-truck-001,key-truck-002
+    restart: unless-stopped
+
+  logistics-service:
+    build:
+      context: ./logistics-service
+      dockerfile: Dockerfile
+    container_name: logistics-service
+    depends_on:
+      logistics-db:
+        condition: service_started
+      logistics-cache:
+        condition: service_started
+      telemetry-mw-rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      POSTGRES_HOST: logistics-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      RABBITMQ_USER: admin
+      RABBITMQ_PASSWORD: password
+      RABBITMQ_HOST: telemetry-mw-rabbitmq
+      RABBITMQ_PORT: 5672
+      REDIS_HOST: logistics-cache
+      REDIS_PORT: 6379
+
+    restart: unless-stopped
 configs:
   rabbitmq-plugins:
     content: "[rabbitmq_management]."

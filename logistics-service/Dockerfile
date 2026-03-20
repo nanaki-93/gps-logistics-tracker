@@ -1,16 +1,19 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────
-FROM gradle:8.7-jdk21 AS builder
+FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /app
 
-# Copy dependency files first — Docker caches this layer
-# and only re-downloads dependencies when build files change
-COPY build.gradle.kts settings.gradle.kts ./
+# Copy wrapper and build files first for better layer caching
+COPY gradlew ./
 COPY gradle ./gradle
-RUN gradle dependencies --no-daemon
+COPY build.gradle.kts settings.gradle.kts ./
+RUN chmod +x ./gradlew
+
+# Use the Gradle Wrapper version from gradle-wrapper.properties
+RUN ./gradlew dependencies --no-daemon
 
 # Copy source and build
 COPY src ./src
-RUN gradle bootJar --no-daemon -x test
+RUN ./gradlew bootJar --no-daemon -x test
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine
