@@ -24,7 +24,7 @@ spring:
     redis:
       time-to-live: 300000   # 5 minutes in milliseconds
 rabbitmq:
-  exchange: telemtry.exchange
+  exchange: telemetry.exchange
   queue: telemetry.queue
   routing-key: telemetry.#
   dlq: telemetry.dlq

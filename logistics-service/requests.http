@@ -7,3 +7,14 @@ Content-Type: application/json
   "phone": "3333333333",
   "licenseNumber": "ABC123456"
 }
+
+###
+POST http://localhost:8090/api/v1/telemetry
+Content-Type: application/json
+
+{
+"driverUid": "c453b0e4-0304-4469-b343-4b5afd94c6cf",
+"lng": 39.651212,
+"lat": 136.651212,
+"recordedAt": "2026-03-19T23:15:06Z"
+}

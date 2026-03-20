@@ -33,12 +33,5 @@ object ParcelMapper {
             status = parcelDto.status,
         )
 
-    fun toEntity(parcelDto: ParcelDto): Parcel =
-        Parcel(
-            routeUid = parcelDto.route..toUuid(),
-            senderUid = parcelDto.senderUid.toUuid(),
-            receiverUid = parcelDto.receiverUid.toUuid(),
-            trackingCode = parcelDto.trackingCode,
-            status = parcelDto.status,
-        )
+
 }
