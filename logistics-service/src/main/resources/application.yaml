@@ -31,6 +31,16 @@ rabbitmq:
 server:
   port: ${LOGISTICS_SERVICE_PORT:8080}
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: logistics-service
   otlp:
     metrics:
       export:
