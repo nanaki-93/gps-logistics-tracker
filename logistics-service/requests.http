@@ -18,8 +18,21 @@ POST http://localhost:8090/api/v1/telemetry
 Content-Type: application/json
 
 {
-"driverUid": "c453b0e4-0304-4469-b343-4b5afd94c6cf",
-"lng": 39.651212,
-"lat": 136.651212,
-"recordedAt": "2026-03-20T22:16:06Z"
+  "driverUid": "c453b0e4-0304-4469-b343-4b5afd94c6cf",
+  "lng": 39.651212,
+  "lat": 136.651212,
+  "recordedAt": "2026-03-20T10:16:06Z"
 }
+
+
+###
+POST http://localhost:8090/api/v1/telemetry
+Content-Type: application/json
+
+{
+  "driverUid": "05c542fb-f9eb-4f46-b30a-2f15cc0152f7",
+  "lng": 39.651212,
+  "lat": 136.651212,
+  "recordedAt": "2026-03-20T10:16:28Z"
+}
+

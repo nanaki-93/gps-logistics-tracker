@@ -1,6 +1,7 @@
 package com.github.nanaki93.logisticsservice.domain.telemetryevent
 
 import io.micrometer.observation.annotation.Observed
+import io.opentelemetry.api.trace.Span
 import org.springframework.amqp.AmqpRejectAndDontRequeueException
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.stereotype.Component
@@ -16,6 +17,7 @@ class TelemtryEventConsumer(
     )
     fun consumeTelemetryEvent(event: TelemetryEventPlainDto) {
         try {
+            println("Processing message in trace: ${Span.current().spanContext.traceId}")
             telemetryEventService.processTelemetryEvent(event)
         } catch (e: Exception) {
             // Log the error and continue processing other events

@@ -42,6 +42,12 @@ management:
           # Port 4318 is the default for OTLP over HTTP
           endpoint: "http://${OTEL_COLLECTOR_HOST:localhost}:4318/v1/traces"
   tracing:
+    propagation:
+      type: [ W3C ]
+    observations:
+      key-values:
+        messaging:
+          enabled: true
     sampling:
       # Use 1.0 to see all traces in development
       probability: 1.0
