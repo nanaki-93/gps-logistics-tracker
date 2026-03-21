@@ -1,5 +1,6 @@
 package com.github.nanaki93.logisticsservice.domain.telemetryevent
 
+import io.micrometer.observation.annotation.Observed
 import org.springframework.amqp.AmqpRejectAndDontRequeueException
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.stereotype.Component
@@ -9,6 +10,10 @@ class TelemtryEventConsumer(
     private val telemetryEventService: TelemetryEventService,
 ) {
     @RabbitListener(queues = [$$"${rabbitmq.queue}"])
+    @Observed(
+        name            = "telemetry.event.consume",
+        contextualName  = "consume-telemetry-event",
+    )
     fun consumeTelemetryEvent(event: TelemetryEventPlainDto) {
         try {
             telemetryEventService.processTelemetryEvent(event)
