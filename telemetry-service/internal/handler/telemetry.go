@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"com.github.nanaki93/telemetry-service/internal/metrics"
 	"com.github.nanaki93/telemetry-service/internal/model"
 	"com.github.nanaki93/telemetry-service/internal/worker"
 	"go.opentelemetry.io/otel/attribute"
@@ -48,6 +49,7 @@ func (h *TelemetryHandler) HandleTelemetry(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	metrics.SetQueueDepth(h.pool.QueueDepth())
 	span.SetStatus(codes.Ok, "telemetry data processed successfully")
 	w.WriteHeader(http.StatusAccepted)
 }

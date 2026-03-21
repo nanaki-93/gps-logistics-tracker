@@ -20,6 +20,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimdw "github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
@@ -68,7 +69,7 @@ func main() {
 	r.Use(chimdw.Logger)
 	r.Use(chimdw.Recoverer)
 	r.Use(chimdw.Timeout(30 * time.Second))
-
+	r.Use(middleware.RequestMetrics)
 	//r.Use(middleware.APIKeyAuth(cfg.ApiKeys))
 	r.Use(middleware.RateLimiter(cfg.RateLimitRPS))
 	r.Post("/api/v1/telemetry", h.HandleTelemetry)
@@ -76,6 +77,8 @@ func main() {
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
+
+	r.Get("/metrics", promhttp.Handler().ServeHTTP)
 
 	server := &http.Server{
 		Addr:         ":" + cfg.Port,

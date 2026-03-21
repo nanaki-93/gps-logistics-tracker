@@ -14,7 +14,7 @@ type Publisher struct {
 	conn         *amqp.Connection
 	channel      *amqp.Channel
 	exchangeName string
-	routeingKey  string
+	routingKey   string
 }
 
 type amqpHeaderCarrier amqp.Table
@@ -40,7 +40,7 @@ func (c amqpHeaderCarrier) Keys() []string {
 	return keys
 }
 
-func NewPublisher(url, exchangeName, routeingKey string) (*Publisher, error) {
+func NewPublisher(url, exchangeName, routingKey string) (*Publisher, error) {
 	conn, err := amqp.Dial(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to rabbitmq: %v", err)
@@ -61,7 +61,7 @@ func NewPublisher(url, exchangeName, routeingKey string) (*Publisher, error) {
 
 	fmt.Printf("Connected to RabbitMQ, exchange: %s\n", exchangeName)
 
-	return &Publisher{conn, channel, exchangeName, routeingKey}, nil
+	return &Publisher{conn, channel, exchangeName, routingKey}, nil
 }
 
 func (p *Publisher) Publish(ctx context.Context, event model.GpsEvent) error {
@@ -76,7 +76,7 @@ func (p *Publisher) Publish(ctx context.Context, event model.GpsEvent) error {
 	return p.channel.PublishWithContext(
 		ctx,
 		p.exchangeName,
-		p.routeingKey,
+		p.routingKey,
 		false,
 		false,
 		amqp.Publishing{
