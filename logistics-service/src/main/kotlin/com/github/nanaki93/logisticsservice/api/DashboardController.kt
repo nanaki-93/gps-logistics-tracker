@@ -27,9 +27,12 @@ class DashboardController(
     val parcelService: ParcelService,
 ) {
     @GetMapping("/test-header")
-    fun handle(@RequestHeader headers: Map<String, String>) {
+    fun handle(
+        @RequestHeader headers: Map<String, String>,
+    ) {
         headers.forEach { (k, v) -> println("$k: $v") }
     }
+
     @GetMapping("drivers")
     fun getDrivers(): List<DriverDto> = driverService.getAll()
 
@@ -41,12 +44,12 @@ class DashboardController(
     @PostMapping("driver")
     fun insertDriver(
         @RequestBody driver: DriverDto,
-    ) : Driver = driverService.create(driver)
+    ): Driver = driverService.create(driver)
 
     @DeleteMapping("driver/{driverUid}")
     fun deleteDriver(
         @PathVariable driverUid: String,
-    ) : Unit = driverService.delete(driverUid.toUuid())
+    ): Unit = driverService.delete(driverUid.toUuid())
 
     @PostMapping("vehicle")
     fun insertVehicle(

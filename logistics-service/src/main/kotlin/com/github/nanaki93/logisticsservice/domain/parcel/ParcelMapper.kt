@@ -32,6 +32,4 @@ object ParcelMapper {
             trackingCode = parcelDto.trackingCode,
             status = parcelDto.status,
         )
-
-
 }

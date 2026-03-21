@@ -35,7 +35,7 @@ class RabbitMQConfig(
     fun rabbitListenerContainerFactory(
         configurer: SimpleRabbitListenerContainerFactoryConfigurer,
         connectionFactory: ConnectionFactory,
-        observationRegistry: ObservationRegistry // Injected by Spring Boot 4
+        observationRegistry: ObservationRegistry, // Injected by Spring Boot 4
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         configurer.configure(factory, connectionFactory)
@@ -48,8 +48,6 @@ class RabbitMQConfig(
 
         return factory
     }
-
-
 
     @Bean
     fun deadLetterQueue(): Queue = QueueBuilder.durable(rabbitProps.dlq).build()

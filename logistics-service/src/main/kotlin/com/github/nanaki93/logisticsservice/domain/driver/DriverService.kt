@@ -9,9 +9,7 @@ class DriverService(
     val driverRepository: DriverRepository,
     val vehicleRepository: VehicleRepository,
 ) {
-    fun create(driverDto: DriverDto) : Driver=
-        driverRepository.save(DriverMapper.toEntity(driverDto))
-
+    fun create(driverDto: DriverDto): Driver = driverRepository.save(DriverMapper.toEntity(driverDto))
 
     fun getByUId(uid: UUID): DriverDto {
         val driver = driverRepository.findById(uid).orElseThrow { IllegalArgumentException("Driver not found") }

@@ -7,13 +7,13 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.stereotype.Component
 
 @Component
-class TelemtryEventConsumer(
+class TelemetryEventConsumer(
     private val telemetryEventService: TelemetryEventService,
 ) {
     @RabbitListener(queues = [$$"${rabbitmq.queue}"])
     @Observed(
-        name            = "telemetry.event.consume",
-        contextualName  = "consume-telemetry-event",
+        name = "telemetry.event.consume",
+        contextualName = "consume-telemetry-event",
     )
     fun consumeTelemetryEvent(event: TelemetryEventPlainDto) {
         try {
