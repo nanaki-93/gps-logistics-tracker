@@ -22,20 +22,22 @@ type Config struct {
 
 	ApiKeys map[string]struct{}
 
-	RateLimitRPS int
+	RateLimitRPS     int
+	OTelCollectorURL string
 }
 
 func Load() (*Config, error) {
 	cfg := &Config{
-		Port:          getEnv("PORT", "8090"),
-		ReadTimeout:   getDuration("READ_TIMEOUT", 5*time.Second),
-		WriteTimeout:  getDuration("WRITE_TIMEOUT", 10*time.Second),
-		RabbitMQUrl:   requiredEnv("RABBITMQ_URL"),
-		ExchangeName:  getEnv("RABBITMQ_EXCHANGE", "telemetry.exchange"),
-		RoutingKey:    getEnv("RABBITMQ_ROUTING_KEY", "telemetry.#"),
-		WorkerCount:   getInt("WORKER_COUNT", 50),
-		ChannelBuffer: getInt("CHANNEL_BUFFER", 10_000),
-		RateLimitRPS:  getInt("RATE_LIMIT_RPS", 50),
+		Port:             getEnv("PORT", "8090"),
+		ReadTimeout:      getDuration("READ_TIMEOUT", 5*time.Second),
+		WriteTimeout:     getDuration("WRITE_TIMEOUT", 10*time.Second),
+		RabbitMQUrl:      requiredEnv("RABBITMQ_URL"),
+		ExchangeName:     getEnv("RABBITMQ_EXCHANGE", "telemetry.exchange"),
+		RoutingKey:       getEnv("RABBITMQ_ROUTING_KEY", "telemetry.#"),
+		WorkerCount:      getInt("WORKER_COUNT", 50),
+		ChannelBuffer:    getInt("CHANNEL_BUFFER", 10_000),
+		RateLimitRPS:     getInt("RATE_LIMIT_RPS", 50),
+		OTelCollectorURL: getEnv("OTEL_COLLECTOR_URL", "http://localhost:4318"),
 	}
 	rawKeys := requiredEnv("API_KEYS")
 	cfg.ApiKeys = parseAPIKeys(rawKeys)

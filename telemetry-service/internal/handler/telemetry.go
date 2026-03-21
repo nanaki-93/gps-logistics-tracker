@@ -2,11 +2,13 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"com.github.nanaki93/telemetry-service/internal/model"
 	"com.github.nanaki93/telemetry-service/internal/worker"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type TelemetryHandler struct {
@@ -20,23 +22,32 @@ func NewTelemetryHandler(pool *worker.Pool) *TelemetryHandler {
 }
 
 func (h *TelemetryHandler) HandleTelemetry(w http.ResponseWriter, r *http.Request) {
+	span := trace.SpanFromContext(r.Context())
 
 	var event model.GpsEvent
 	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
+		span.SetStatus(codes.Error, "invalid request body: "+err.Error()+"")
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	if err := event.Validate(); err != nil {
+		span.SetStatus(codes.Error, "invalid telemetry data: "+err.Error()+"")
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
+	span.SetAttributes(
+		attribute.String("driverUid", event.DriverUid),
+		attribute.Float64("gps.lat", event.Lat),
+		attribute.Float64("gps.lng", event.Lng),
+	)
 	if err := h.pool.Submit(event); err != nil {
+		span.SetStatus(codes.Error, "failed to submit telemetry data: "+err.Error()+"")
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
 		return
 	}
 
-	fmt.Printf("Received telemetry data: %v\n", event)
+	span.SetStatus(codes.Ok, "telemetry data processed successfully")
 	w.WriteHeader(http.StatusAccepted)
 }

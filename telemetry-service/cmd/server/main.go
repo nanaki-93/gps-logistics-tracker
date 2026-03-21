@@ -15,10 +15,12 @@ import (
 	"com.github.nanaki93/telemetry-service/internal/handler"
 	"com.github.nanaki93/telemetry-service/internal/middleware"
 	"com.github.nanaki93/telemetry-service/internal/queue"
+	"com.github.nanaki93/telemetry-service/internal/telemetry"
 	"com.github.nanaki93/telemetry-service/internal/worker"
 	"github.com/go-chi/chi/v5"
 	chimdw "github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
@@ -30,6 +32,16 @@ func main() {
 	if err != nil {
 		log.Fatal(">" + fmt.Sprintf("failed to load config: %v", err))
 	}
+
+	shutdown, err := telemetry.Init(
+		context.Background(),
+		"telemetry-service",
+		cfg.OTelCollectorURL,
+	)
+	if err != nil {
+		log.Fatalf("otel init failed: %v", err)
+	}
+	defer shutdown()
 
 	publisher, err := queue.NewPublisher(cfg.RabbitMQUrl, cfg.ExchangeName, cfg.RoutingKey)
 	if err != nil {
@@ -47,10 +59,12 @@ func main() {
 	pool.Start()
 
 	h := handler.NewTelemetryHandler(pool)
+
 	r := chi.NewRouter()
 
 	r.Use(chimdw.RequestID)
 	r.Use(chimdw.RealIP)
+	r.Use(otelhttp.NewMiddleware("telemetry-service"))
 	r.Use(chimdw.Logger)
 	r.Use(chimdw.Recoverer)
 	r.Use(chimdw.Timeout(30 * time.Second))

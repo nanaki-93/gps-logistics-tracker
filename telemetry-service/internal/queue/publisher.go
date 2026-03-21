@@ -7,6 +7,7 @@ import (
 
 	"com.github.nanaki93/telemetry-service/internal/model"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"go.opentelemetry.io/otel"
 )
 
 type Publisher struct {
@@ -14,6 +15,29 @@ type Publisher struct {
 	channel      *amqp.Channel
 	exchangeName string
 	routeingKey  string
+}
+
+type amqpHeaderCarrier amqp.Table
+
+func (c amqpHeaderCarrier) Get(key string) string {
+	v, ok := c[key]
+	if !ok {
+		return ""
+	}
+	s, _ := v.(string)
+	return s
+}
+
+func (c amqpHeaderCarrier) Set(key, val string) {
+	c[key] = val
+}
+
+func (c amqpHeaderCarrier) Keys() []string {
+	keys := make([]string, 0, len(c))
+	for k := range c {
+		keys = append(keys, k)
+	}
+	return keys
 }
 
 func NewPublisher(url, exchangeName, routeingKey string) (*Publisher, error) {
@@ -41,13 +65,17 @@ func NewPublisher(url, exchangeName, routeingKey string) (*Publisher, error) {
 }
 
 func (p *Publisher) Publish(event model.GpsEvent) error {
+	ctx := context.Background()
 	body, err := json.Marshal(event)
 	if err != nil {
 		return fmt.Errorf("failed to marshal event: %w", err)
 	}
 
+	headers := amqp.Table{}
+	otel.GetTextMapPropagator().Inject(ctx, amqpHeaderCarrier(headers))
+
 	return p.channel.PublishWithContext(
-		context.Background(),
+		ctx,
 		p.exchangeName,
 		p.routeingKey,
 		false,
@@ -55,6 +83,7 @@ func (p *Publisher) Publish(event model.GpsEvent) error {
 		amqp.Publishing{
 			ContentType:  "application/json",
 			DeliveryMode: amqp.Persistent,
+			Headers:      headers,
 			Body:         body,
 		})
 }
