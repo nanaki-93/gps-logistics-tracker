@@ -37,6 +37,7 @@ jobs:
         with:
           version: latest
           working-directory: telemetry-service
+          install-mode: go-get
           args: --timeout=5m
 
   # ── 2. Test ────────────────────────────────────────────────────────────────
