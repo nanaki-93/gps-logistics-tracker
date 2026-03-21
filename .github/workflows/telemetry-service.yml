@@ -33,12 +33,12 @@ jobs:
           go-version-file: telemetry-service/go.mod
           cache-dependency-path: telemetry-service/go.sum
 
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
-          working-directory: telemetry-service
-          args: --timeout=5m
+        run: golangci-lint run --timeout=5m
+        working-directory: telemetry-service
 
   # ── 2. Test ────────────────────────────────────────────────────────────────
   test:
