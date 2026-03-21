@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"context"
 	"errors"
 	"log"
 	"sync"
@@ -11,8 +12,12 @@ import (
 
 var ErrChannelFull = errors.New("worker channel is full")
 
+type Job struct {
+	Ctx   context.Context
+	Event model.GpsEvent
+}
 type Pool struct {
-	jobs        chan model.GpsEvent
+	jobs        chan Job
 	workerCount int
 	publisher   *queue.Publisher
 	wg          sync.WaitGroup
@@ -20,7 +25,7 @@ type Pool struct {
 
 func NewPool(workerCount, bufferSize int, publisher *queue.Publisher) *Pool {
 	return &Pool{
-		jobs:        make(chan model.GpsEvent, bufferSize),
+		jobs:        make(chan Job, bufferSize),
 		workerCount: workerCount,
 		publisher:   publisher,
 	}
@@ -34,9 +39,9 @@ func (p *Pool) Start() {
 	log.Printf("worker pool started with %d workers", p.workerCount)
 }
 
-func (p *Pool) Submit(event model.GpsEvent) error {
+func (p *Pool) Submit(ctx context.Context, event model.GpsEvent) error {
 	select {
-	case p.jobs <- event:
+	case p.jobs <- Job{Ctx: ctx, Event: event}:
 		return nil
 	default:
 		return ErrChannelFull
@@ -52,8 +57,8 @@ func (p *Pool) Stop() {
 
 func (p *Pool) work() {
 	defer p.wg.Done()
-	for event := range p.jobs {
-		if err := p.publisher.Publish(event); err != nil {
+	for job := range p.jobs {
+		if err := p.publisher.Publish(job.Ctx, job.Event); err != nil {
 			log.Printf("failed to publish event: %v", err)
 		}
 	}

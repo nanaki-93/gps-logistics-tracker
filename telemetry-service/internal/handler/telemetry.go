@@ -42,7 +42,7 @@ func (h *TelemetryHandler) HandleTelemetry(w http.ResponseWriter, r *http.Reques
 		attribute.Float64("gps.lat", event.Lat),
 		attribute.Float64("gps.lng", event.Lng),
 	)
-	if err := h.pool.Submit(event); err != nil {
+	if err := h.pool.Submit(r.Context(), event); err != nil {
 		span.SetStatus(codes.Error, "failed to submit telemetry data: "+err.Error()+"")
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
 		return

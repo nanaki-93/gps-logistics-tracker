@@ -64,8 +64,7 @@ func NewPublisher(url, exchangeName, routeingKey string) (*Publisher, error) {
 	return &Publisher{conn, channel, exchangeName, routeingKey}, nil
 }
 
-func (p *Publisher) Publish(event model.GpsEvent) error {
-	ctx := context.Background()
+func (p *Publisher) Publish(ctx context.Context, event model.GpsEvent) error {
 	body, err := json.Marshal(event)
 	if err != nil {
 		return fmt.Errorf("failed to marshal event: %w", err)
