@@ -53,6 +53,29 @@ services:
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
 
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana-provisioning/:/etc/grafana/provisioning/
+
   telemetry-service:
     build:
       context: ./telemetry-service
@@ -120,4 +143,8 @@ volumes:
   cache-data:
     driver: local
   db-data:
+    driver: local
+  grafana-data:
+    driver: local
+  prometheus-data:
     driver: local
