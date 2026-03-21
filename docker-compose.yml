@@ -44,6 +44,15 @@ services:
       retries: 10
       start_period: 20s
 
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+
   telemetry-service:
     build:
       context: ./telemetry-service
@@ -52,6 +61,8 @@ services:
     depends_on:
       telemetry-mw-rabbitmq:
         condition: service_healthy
+      jaeger:
+        condition: service_started
     ports:
       - "8090:8090"
     environment:
@@ -63,6 +74,8 @@ services:
       CHANNEL_BUFFER: 1000
       RATE_LIMIT_RPS: 50
       API_KEYS: key-truck-001,key-truck-002
+      OTEL_COLLECTOR_URL: jaeger:4317
+
     restart: unless-stopped
 
   logistics-service:
@@ -77,6 +90,8 @@ services:
         condition: service_started
       telemetry-mw-rabbitmq:
         condition: service_healthy
+      jaeger:
+        condition: service_started
     ports:
       - "8080:8080"
     environment:
@@ -90,6 +105,7 @@ services:
       RABBITMQ_PORT: 5672
       REDIS_HOST: logistics-cache
       REDIS_PORT: 6379
+      OTEL_COLLECTOR_HOST: jaeger
 
     restart: unless-stopped
 configs:
