@@ -73,7 +73,7 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - grafana-data:/var/lib/grafana
+      - grafana-data:/var/lib/grafana-provisioning
       - ./monitoring/grafana-provisioning/:/etc/grafana/provisioning/
 
   telemetry-service:
