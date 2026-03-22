@@ -1,7 +1,6 @@
 package com.github.nanaki93.logisticsservice.domain.telemetryevent
 
 import io.micrometer.observation.annotation.Observed
-import io.opentelemetry.api.trace.Span
 import org.springframework.amqp.AmqpRejectAndDontRequeueException
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.stereotype.Component

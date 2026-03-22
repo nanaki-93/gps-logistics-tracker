@@ -16,18 +16,24 @@ class ObservationConfig {
 }
 
 @Component
-class EventMetrics(private val registry: MeterRegistry){
-
+class EventMetrics(
+    private val registry: MeterRegistry,
+) {
     fun incrementProcessed(outcome: String) {
-        Counter.builder("logistics_events_processed_total")
+        Counter
+            .builder("logistics_events_processed_total")
             .description("Total number of processed logistics events")
             .tag("outcome", outcome)
             .register(registry)
             .increment()
     }
 
-    fun incrementStatusTransition(fromStatus: String, toStatus: String) {
-        Counter.builder("logistics_status_transitions_total")
+    fun incrementStatusTransition(
+        fromStatus: String,
+        toStatus: String,
+    ) {
+        Counter
+            .builder("logistics_status_transitions_total")
             .description("Total number of parcel status transitions")
             .tag("from_status", fromStatus)
             .tag("to_status", toStatus)
@@ -36,11 +42,11 @@ class EventMetrics(private val registry: MeterRegistry){
     }
 
     fun recordRouteDeviationMeters(deviationMeters: Double) {
-        DistributionSummary.builder("logistics_route_deviation_meters")
+        DistributionSummary
+            .builder("logistics_route_deviation_meters")
             .description("Route deviation in meters")
             .baseUnit("meters")
             .register(registry)
             .record(deviationMeters)
     }
 }
-
