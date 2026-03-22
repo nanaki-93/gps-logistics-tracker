@@ -10,7 +10,9 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o /app/telemetry-service ./cmd/server
+ARG TARGETOS
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /app/telemetry-service ./cmd/server
 
 # Runtime stage
 FROM alpine:3.22

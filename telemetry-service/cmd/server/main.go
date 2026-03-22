@@ -66,7 +66,7 @@ func main() {
 	r.Use(chimdw.RequestID)
 	r.Use(chimdw.RealIP)
 	r.Use(otelhttp.NewMiddleware("telemetry-service"))
-	r.Use(chimdw.Logger)
+	//r.Use(chimdw.Logger)
 	r.Use(chimdw.Recoverer)
 	r.Use(chimdw.Timeout(30 * time.Second))
 	r.Use(middleware.RequestMetrics)
