@@ -67,6 +67,7 @@ class ParcelService(
         parcelRepository.save(parcel.assign(parcelAssignDto.driverUid.toUuid()))
     }
 
+
     fun evaluateAll(event: TelemetryEventPlainDto) {
         val parcels = parcelRepository.findByDriverUid(event.driverUid.toUuid())
         // calculate deviation

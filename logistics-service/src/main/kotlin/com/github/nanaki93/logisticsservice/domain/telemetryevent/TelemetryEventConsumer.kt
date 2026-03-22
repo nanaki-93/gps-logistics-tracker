@@ -17,7 +17,6 @@ class TelemetryEventConsumer(
     )
     fun consumeTelemetryEvent(event: TelemetryEventPlainDto) {
         try {
-            println("Processing message in trace: ${Span.current().spanContext.traceId}")
             telemetryEventService.processTelemetryEvent(event)
         } catch (e: Exception) {
             // Log the error and continue processing other events

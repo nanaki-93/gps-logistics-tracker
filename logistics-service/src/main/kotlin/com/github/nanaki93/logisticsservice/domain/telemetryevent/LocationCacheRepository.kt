@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 import tools.jackson.databind.ObjectMapper
 import java.time.Duration
+import java.time.Instant
 import java.util.UUID
 
 @Repository
@@ -17,13 +18,14 @@ class LocationCacheRepository(
 
     fun set(
         driverUid: String,
-        point: CoordinatesDto,
+        telemetryEvent: TelemetryEventPlainDto,
     ) = redisTemplate.opsForValue().set(
         keyPrefix + driverUid,
-        objectMapper.writeValueAsString(point),
+        objectMapper.writeValueAsString(telemetryEvent),
         ttl,
     )
 
-    fun get(driverUid: UUID): CoordinatesDto? =
-        redisTemplate.opsForValue().get(keyPrefix + driverUid.toString())?.let { objectMapper.readValue(it, CoordinatesDto::class.java) }
+    fun get(driverUid: UUID): TelemetryEventPlainDto? =
+        redisTemplate.opsForValue().get(keyPrefix + driverUid.toString())?.let { objectMapper.readValue(it,
+            TelemetryEventPlainDto::class.java) }
 }

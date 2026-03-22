@@ -1,5 +1,6 @@
 package com.github.nanaki93.logisticsservice.domain.telemetryevent
 
+import com.github.nanaki93.logisticsservice.config.EventMetrics
 import com.github.nanaki93.logisticsservice.domain.parcel.ParcelService
 import com.github.nanaki93.logisticsservice.domain.telemetryevent.websocket.TelemetryEventWebSocketHandler
 import com.github.nanaki93.logisticsservice.domain.util.CoordinatesDto
@@ -15,10 +16,13 @@ class TelemetryEventService(
     val locationCacheRepository: LocationCacheRepository,
     val parcelService: ParcelService,
     val webSocketHandler: TelemetryEventWebSocketHandler,
+    val eventMetrics: EventMetrics
 ) {
     fun processTelemetryEvent(event: TelemetryEventPlainDto) {
+
         getLastTelemetryEventByDriver(event.driverUid)?.let { lastTelemetryEvent ->
             if (shouldSkip(lastTelemetryEvent.recordedAt, event.recordedAt)) {
+                eventMetrics.incrementProcessed("Skipped")
                 println(
                     "Skipping telemetry event for driver ${event.driverUid} recorded at ${event.recordedAt} as it's too close to the last recorded event at ${lastTelemetryEvent.recordedAt}",
                 )
@@ -28,16 +32,18 @@ class TelemetryEventService(
 
         telemetryEventRepository.insert(TelemetryEventMapper.toEntity(event))
 
-        locationCacheRepository.set(event.driverUid, CoordinatesDto(event.lng, event.lat))
+        locationCacheRepository.set(event.driverUid, event)
 
         webSocketHandler.broadcast(event.driverUid, event)
+
         parcelService.evaluateAll(event)
 
-        println("TelemetryEvent received: ${event.driverUid} - lng : ${event.lng} - lat: ${event.lat} at ${event.recordedAt}")
+        eventMetrics.incrementProcessed("Success")
+
     }
 
-    fun getLastTelemetryEventByDriver(driverUid: String): TelemetryEvent? =
-        telemetryEventRepository.findLatestByDriver(driverUid.toUuid()).orElse(null)
+    fun getLastTelemetryEventByDriver(driverUid: String): TelemetryEventPlainDto? =
+        locationCacheRepository.get(driverUid.toUuid())
 
     fun shouldSkip(
         lastRecordedAt: Instant,

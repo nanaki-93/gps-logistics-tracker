@@ -6,6 +6,11 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USER:admin}
     password: ${RABBITMQ_PASSWORD:password}
+    listener:
+      simple:
+        concurrency: 4
+        max-concurrency: 16
+        prefetch: 100
   jpa:
     database: POSTGRESQL
   datasource:
@@ -39,6 +44,9 @@ management:
     health:
       show-details: always
   metrics:
+    distribution:
+      percentiles-histogram:
+        logistics_route_deviation_meters: true
     tags:
       application: logistics-service
   otlp:
