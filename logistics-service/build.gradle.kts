@@ -36,6 +36,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
 	implementation("org.springframework.boot:spring-boot-starter-aspectj")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("net.logstash.logback:logstash-logback-encoder:8.0")
 	implementation("io.micrometer:micrometer-registry-prometheus")
 	implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")

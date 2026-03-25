@@ -82,15 +82,3 @@ class DashboardController(
         @RequestBody parcelAssignDto: ParcelAssignDto,
     ) = parcelService.assign(parcelAssignDto)
 }
-
-/**
- * Api:
- * parcel: get all parcels
- * parcel: get a parcel by id
- * parcel: insert a new parcel
- * parcel: change status of a parcel
- *
- *telemetry: get telemetry data for a vehicle
- *
- *
- */

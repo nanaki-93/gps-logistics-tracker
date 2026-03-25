@@ -69,4 +69,6 @@ management:
     sampling:
       # Use 1.0 to see all traces in development
       probability: 1.0
-
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

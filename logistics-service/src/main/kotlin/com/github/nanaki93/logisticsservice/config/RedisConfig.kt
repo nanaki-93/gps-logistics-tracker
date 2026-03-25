@@ -13,7 +13,6 @@ class RedisConfig {
         val template = RedisTemplate<String, String>()
         template.connectionFactory = connectionFactory
 
-        // Use plain string serialization — values are JSON strings
         val serializer = StringRedisSerializer()
         template.keySerializer = serializer
         template.valueSerializer = serializer

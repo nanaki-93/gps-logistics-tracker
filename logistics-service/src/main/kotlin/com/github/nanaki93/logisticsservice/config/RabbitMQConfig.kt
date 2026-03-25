@@ -35,7 +35,7 @@ class RabbitMQConfig(
     fun rabbitListenerContainerFactory(
         configurer: SimpleRabbitListenerContainerFactoryConfigurer,
         connectionFactory: ConnectionFactory,
-        observationRegistry: ObservationRegistry, // Injected by Spring Boot 4
+        observationRegistry: ObservationRegistry,
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
         configurer.configure(factory, connectionFactory)

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Read active profile from Spring -->
+    <springProfile name="local">
+        <!-- Human-readable output for local development -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>
+                    %d{HH:mm:ss.SSS} %highlight(%-5level) %cyan([%thread]) %yellow(%logger{36}) - %msg
+                    %n%yellow(traceId=%X{traceId} spanId=%X{spanId})%n
+                </pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <!-- Reduce noise from framework internals locally -->
+        <logger name="org.springframework"        level="WARN"/>
+        <logger name="org.hibernate"              level="WARN"/>
+        <logger name="com.zaxxer.hikari"          level="WARN"/>
+        <logger name="io.lettuce"                 level="WARN"/>
+        <logger name="org.springframework.amqp"   level="INFO"/>
+    </springProfile>
+
+    <springProfile name="!local">
+        <!-- JSON output for production — parseable by Datadog, Loki, CloudWatch -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <!-- Standard fields -->
+                <fieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <level>level</level>
+                    <thread>thread</thread>
+                    <logger>logger</logger>
+                    <message>message</message>
+                </fieldNames>
+                <!-- Include OTel trace context automatically -->
+                <includeMdcKeyName>traceId</includeMdcKeyName>
+                <includeMdcKeyName>spanId</includeMdcKeyName>
+                <includeMdcKeyName>traceFlags</includeMdcKeyName>
+                <!-- Always include service name -->
+                <customFields>{"service":"logistics-service"}</customFields>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <logger name="org.springframework"  level="WARN"/>
+        <logger name="org.hibernate"        level="WARN"/>
+        <logger name="com.zaxxer.hikari"    level="WARN"/>
+    </springProfile>
+
+</configuration>
