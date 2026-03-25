@@ -24,6 +24,7 @@ type Config struct {
 
 	RateLimitRPS     int
 	OTelCollectorURL string
+	Env              string
 }
 
 func Load() (*Config, error) {
@@ -38,6 +39,7 @@ func Load() (*Config, error) {
 		ChannelBuffer:    getInt("CHANNEL_BUFFER", 10_000),
 		RateLimitRPS:     getInt("RATE_LIMIT_RPS", 50),
 		OTelCollectorURL: getEnv("OTEL_COLLECTOR_URL", "http://localhost:4318"),
+		Env:              getEnv("ENV", "local"),
 	}
 	rawKeys := requiredEnv("API_KEYS")
 	cfg.ApiKeys = parseAPIKeys(rawKeys)
