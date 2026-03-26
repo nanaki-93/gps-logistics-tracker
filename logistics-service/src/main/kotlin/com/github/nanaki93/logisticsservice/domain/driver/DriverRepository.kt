@@ -9,5 +9,4 @@ import java.util.UUID
 interface DriverRepository : JpaRepository<Driver, UUID> {
     fun save(driver: Driver): Driver
 
-    fun findByVehicleUid(vehicleUid: UUID): Optional<Driver>
 }

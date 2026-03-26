@@ -1,21 +1,12 @@
 create table driver
 (
     driver_uid     uuid primary key,
-    vehicle_uid    uuid,
     fullname       varchar(255),
     email          varchar(255),
     phone          varchar(255),
     license_number varchar(255)
 );
 
-create table vehicle
-(
-    vehicle_uid  uuid primary key,
-    plate_number varchar(255),
-    model        varchar(255),
-    type         varchar(255),
-    active       bool
-);
 
 create table telemetry_event
 (
@@ -85,5 +76,3 @@ alter table telemetry_event
     add constraint FK_telemetry_event_driver foreign key (driver_uid) references driver (driver_uid);
 alter table status_history
     add constraint FK_status_history_parcel foreign key (parcel_uid) references parcel (parcel_uid);
-alter table driver
-    add constraint FK_driver_vehicle foreign key (vehicle_uid) references vehicle (vehicle_uid);

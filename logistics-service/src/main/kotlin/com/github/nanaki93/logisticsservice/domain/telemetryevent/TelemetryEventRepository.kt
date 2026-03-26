@@ -58,7 +58,7 @@ class TelemetryEventRepository(
                     )
                 }.let { Optional.of(it) }
         } catch (e: EmptyResultDataAccessException) {
-            Optional.empty<TelemetryEvent>() // no events yet for this vehicle
+            Optional.empty<TelemetryEvent>() // no events yet for this driver
         }
     }
 

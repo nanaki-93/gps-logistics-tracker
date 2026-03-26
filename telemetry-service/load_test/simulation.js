@@ -157,11 +157,9 @@ export default function (data) {
 export function teardown(data) {
     console.log(`Teardown: cleaning up ${data.drivers.length} drivers`);
 
-    // Optional — delete test data after the run
-    // Comment this out if you want to inspect the data after the test
-    for (const driver of data.drivers) {
-        http.del(`${LOGISTICS_URL}/api/v1/dashboard/driver/${driver.driverUid}`);
-    }
+    // for (const driver of data.drivers) {
+    //     http.del(`${LOGISTICS_URL}/api/v1/dashboard/driver/${driver.driverUid}`);
+    // }
 
     console.log('Teardown complete');
 }

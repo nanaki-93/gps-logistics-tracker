@@ -10,29 +10,8 @@ import java.util.UUID
 class Driver(
     @Id
     val driverUid: UUID = UUID.randomUUID(),
-    val vehicleUid: UUID? = null,
     val fullname: String,
     val email: String,
     val phone: String,
     val licenseNumber: String,
-) {
-    fun assign(vehicleUid: UUID) =
-        Driver(
-            driverUid = driverUid,
-            vehicleUid = vehicleUid,
-            fullname = fullname,
-            email = email,
-            phone = phone,
-            licenseNumber = licenseNumber,
-        )
-
-    fun unassign() =
-        Driver(
-            driverUid = driverUid,
-            fullname = fullname,
-            email = email,
-            phone = phone,
-            licenseNumber = licenseNumber,
-            vehicleUid = null,
-        )
-}
+)

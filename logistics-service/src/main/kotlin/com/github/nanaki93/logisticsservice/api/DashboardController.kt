@@ -8,8 +8,6 @@ import com.github.nanaki93.logisticsservice.domain.parcel.ParcelDto
 import com.github.nanaki93.logisticsservice.domain.parcel.ParcelInsertDto
 import com.github.nanaki93.logisticsservice.domain.parcel.ParcelService
 import com.github.nanaki93.logisticsservice.domain.util.toUuid
-import com.github.nanaki93.logisticsservice.domain.vehicle.VehicleDto
-import com.github.nanaki93.logisticsservice.domain.vehicle.VehicleService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/dashboard")
 class DashboardController(
     val driverService: DriverService,
-    val vehicleService: VehicleService,
     val parcelService: ParcelService,
 ) {
     @GetMapping("drivers")
@@ -42,19 +39,6 @@ class DashboardController(
     fun deleteDriver(
         @PathVariable driverUid: String,
     ): Unit = driverService.delete(driverUid.toUuid())
-
-    @PostMapping("vehicle")
-    fun insertVehicle(
-        @RequestBody vehicle: VehicleDto,
-    ) = vehicleService.create(vehicle)
-
-    @GetMapping("vehicles")
-    fun getVehicles(): List<VehicleDto> = vehicleService.getAll()
-
-    @GetMapping("vehicle/{vehicleUid}")
-    fun getVehicle(
-        @PathVariable vehicleUid: String,
-    ): VehicleDto = vehicleService.getById(vehicleUid.toUuid())
 
     @PostMapping("parcel")
     fun insertParcel(
