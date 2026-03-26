@@ -31,12 +31,12 @@ class Parcel(
             trackingCode = trackingCode,
             senderUid = senderUid,
             receiverUid = receiverUid,
-            status = status,
+            status = ParcelStatus.DELIVERING,
             pickupTime = pickupTime,
             dropoffTime = dropoffTime,
         )
 
-    fun unassign() =
+    fun withStatus(status: ParcelStatus) =
 
         Parcel(
             parcelUid = parcelUid,

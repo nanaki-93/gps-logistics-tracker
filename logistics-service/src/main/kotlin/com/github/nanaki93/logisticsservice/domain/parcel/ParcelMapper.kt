@@ -30,6 +30,6 @@ object ParcelMapper {
             senderUid = parcelDto.senderUid.toUuid(),
             receiverUid = parcelDto.receiverUid.toUuid(),
             trackingCode = parcelDto.trackingCode,
-            status = parcelDto.status,
+            status = ParcelStatus.TO_BE_ASSIGNED,
         )
 }

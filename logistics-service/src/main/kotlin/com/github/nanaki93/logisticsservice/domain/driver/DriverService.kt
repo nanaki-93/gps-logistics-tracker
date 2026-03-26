@@ -23,6 +23,8 @@ class DriverService(
         return DriverMapper.toDto(driver, vehicle)
     }
 
+    fun isValid(uid: UUID): Boolean = driverRepository.existsById(uid)
+
     fun getAll(): List<DriverDto> {
         val drivers = driverRepository.findAll()
         return drivers.map { driver ->
@@ -61,7 +63,6 @@ class DriverService(
     }
 
     fun unassignVehicle(uid: UUID) {
-        // todo check parcels
         val driver = driverRepository.findById(uid).orElseThrow { IllegalArgumentException("Driver not found") }
         driverRepository.save(driver.unassign())
     }

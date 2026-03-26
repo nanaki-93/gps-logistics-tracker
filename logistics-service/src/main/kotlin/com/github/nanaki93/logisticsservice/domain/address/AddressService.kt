@@ -16,17 +16,9 @@ class AddressService(
         return AddressMapper.toDto(address)
     }
 
-    fun update(
-        uuid: UUID,
-        addressDto: AddressDto,
-    ) {
-        addressRepository.findById(uuid).orElseThrow { IllegalArgumentException("Address not found") }
-        addressRepository.save(AddressMapper.toEntity(addressDto, uuid))
-    }
-
     fun delete(uuid: UUID) {
         addressRepository.deleteById(uuid)
     }
 
-    fun validate(uid: UUID) = addressRepository.findById(uid).isPresent
+    fun validate(uid: UUID) = addressRepository.existsById(uid)
 }

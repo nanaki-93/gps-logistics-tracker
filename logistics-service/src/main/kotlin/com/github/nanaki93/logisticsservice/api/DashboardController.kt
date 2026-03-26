@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -26,13 +25,6 @@ class DashboardController(
     val vehicleService: VehicleService,
     val parcelService: ParcelService,
 ) {
-    @GetMapping("/test-header")
-    fun handle(
-        @RequestHeader headers: Map<String, String>,
-    ) {
-        headers.forEach { (k, v) -> println("$k: $v") }
-    }
-
     @GetMapping("drivers")
     fun getDrivers(): List<DriverDto> = driverService.getAll()
 

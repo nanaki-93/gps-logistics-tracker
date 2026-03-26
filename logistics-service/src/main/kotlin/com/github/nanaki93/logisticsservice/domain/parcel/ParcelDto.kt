@@ -21,7 +21,6 @@ data class ParcelInsertDto(
     val trackingCode: String,
     val senderUid: String,
     val receiverUid: String,
-    val status: ParcelStatus,
 )
 
 data class ParcelAssignDto(

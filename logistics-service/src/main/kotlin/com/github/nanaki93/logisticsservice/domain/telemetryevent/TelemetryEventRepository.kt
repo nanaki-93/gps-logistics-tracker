@@ -1,5 +1,8 @@
 package com.github.nanaki93.logisticsservice.domain.telemetryevent
 
+import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil
+import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toCoordinatesDto
+import com.github.nanaki93.logisticsservice.domain.util.toUuid
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -57,5 +60,31 @@ class TelemetryEventRepository(
         } catch (e: EmptyResultDataAccessException) {
             Optional.empty<TelemetryEvent>() // no events yet for this vehicle
         }
+    }
+
+    fun distanceToDelivery(event: TelemetryEventPlainDto): Map<UUID, Double> {
+        val sql = """
+                    SELECT
+                        p.parcel_uid,
+                        ST_Distance(
+                            ST_GeogFromText(:eventWkt),
+                            a.coordinates::geography
+                        ) AS distance_metres
+                    FROM parcel p
+                    JOIN address a ON a.address_uid = p.receiver_uid
+                    WHERE p.driver_uid = :driverUid
+                      AND p.status NOT IN ('DELIVERED', 'CANCELLED')
+                    ORDER BY distance_metres ASC
+        """
+
+        val params =
+            MapSqlParameterSource().apply {
+                addValue("driverUid", event.driverUid)
+                addValue("eventWkt", GeographyUtil.toWkt(Pair(event.lat, event.lng).toCoordinatesDto()))
+            }
+        return jdbc
+            .query(sql, params) { rs, _ ->
+                rs.getString("parcel_uid").toUuid() to rs.getDouble("distance_metres")
+            }.toMap()
     }
 }
