@@ -7,9 +7,8 @@ import java.util.UUID
 class AddressService(
     val addressRepository: AddressRepository,
 ) {
-    fun create(addressDto: AddressDto) {
-        addressRepository.save(AddressMapper.toEntity(addressDto))
-    }
+    fun create(addressDto: AddressDto): AddressDto =
+        addressRepository.save(AddressMapper.toEntity(addressDto)).let { AddressMapper.toDto(it) }
 
     fun getByUId(uid: UUID): AddressDto {
         val address = addressRepository.findById(uid).orElseThrow { IllegalArgumentException("Address not found") }

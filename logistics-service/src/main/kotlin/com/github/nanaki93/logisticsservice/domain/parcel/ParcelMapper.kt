@@ -14,6 +14,7 @@ object ParcelMapper {
         receiver: AddressDto,
     ): ParcelDto =
         ParcelDto(
+            parcelUid = parcel.parcelUid.toString(),
             route = route,
             driver = driver,
             trackingCode = parcel.trackingCode,
@@ -24,11 +25,11 @@ object ParcelMapper {
             dropoffTime = parcel.dropoffTime,
         )
 
-    fun toInsertEntity(parcelDto: ParcelInsertDto): Parcel =
+    fun toInsertEntity(parcelDto: ParcelCreateDto): Parcel =
         Parcel(
-            routeUid = parcelDto.routeUid.toUuid(),
-            senderUid = parcelDto.senderUid.toUuid(),
-            receiverUid = parcelDto.receiverUid.toUuid(),
+            routeUid = parcelDto.route.routeUid!!.toUuid(),
+            senderUid = parcelDto.sender.addressUid!!.toUuid(),
+            receiverUid = parcelDto.receiver.addressUid!!.toUuid(),
             trackingCode = parcelDto.trackingCode,
             status = ParcelStatus.TO_BE_ASSIGNED,
         )

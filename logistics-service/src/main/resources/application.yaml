@@ -13,6 +13,10 @@ spring:
         prefetch: 100
   jpa:
     database: POSTGRESQL
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        spatial.dialect: org.hibernate.spatial.dialect.postgis.PostgisDialect
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/logistics
     username: ${POSTGRES_USER:postgres}

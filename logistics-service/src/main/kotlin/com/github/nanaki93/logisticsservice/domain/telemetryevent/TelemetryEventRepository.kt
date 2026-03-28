@@ -1,7 +1,8 @@
 package com.github.nanaki93.logisticsservice.domain.telemetryevent
 
+import com.github.nanaki93.logisticsservice.domain.util.CoordinatesDto
 import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil
-import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toCoordinatesDto
+import com.github.nanaki93.logisticsservice.domain.util.logger
 import com.github.nanaki93.logisticsservice.domain.util.toUuid
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -15,6 +16,7 @@ import java.util.UUID
 class TelemetryEventRepository(
     private val jdbc: NamedParameterJdbcTemplate,
 ) {
+    val log = logger()
     fun insert(event: TelemetryEvent) {
         val sql = """
             INSERT INTO telemetry_event 
@@ -29,6 +31,7 @@ class TelemetryEventRepository(
                 .addValue("wkt", event.coordinates) // "POINT(139.69 35.68)"
                 .addValue("recordedAt", Timestamp.from(event.recordedAt))
 
+        println("Inserting telemetry event with coords: ${event.coordinates}")
         jdbc.update(sql, params)
     }
 
@@ -79,8 +82,8 @@ class TelemetryEventRepository(
 
         val params =
             MapSqlParameterSource().apply {
-                addValue("driverUid", event.driverUid)
-                addValue("eventWkt", GeographyUtil.toWkt(Pair(event.lat, event.lng).toCoordinatesDto()))
+                addValue("driverUid", event.driverUid.toUuid())
+                addValue("eventWkt", GeographyUtil.toWkt(CoordinatesDto(lat = event.lat, lng = event.lng)))
             }
         return jdbc
             .query(sql, params) { rs, _ ->

@@ -6,6 +6,7 @@ import com.github.nanaki93.logisticsservice.domain.route.RouteDto
 import java.time.Instant
 
 data class ParcelDto(
+    val parcelUid: String? = null,
     val route: RouteDto,
     val driver: DriverDto?,
     val trackingCode: String,
@@ -16,11 +17,12 @@ data class ParcelDto(
     val dropoffTime: Instant?,
 )
 
-data class ParcelInsertDto(
-    val routeUid: String,
+data class ParcelCreateDto(
+    val parcelUid: String? = null,
+    val route: RouteDto,
     val trackingCode: String,
-    val senderUid: String,
-    val receiverUid: String,
+    val sender: AddressDto,
+    val receiver: AddressDto,
 )
 
 data class ParcelAssignDto(

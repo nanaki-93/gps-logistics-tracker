@@ -27,5 +27,4 @@ class DriverService(
         val driver = driverRepository.findById(uid).orElseThrow { IllegalArgumentException("Driver not found") }
         driverRepository.delete(driver)
     }
-
 }

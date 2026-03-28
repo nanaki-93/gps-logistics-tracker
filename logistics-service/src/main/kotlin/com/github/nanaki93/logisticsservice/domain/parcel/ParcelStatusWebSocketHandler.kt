@@ -55,8 +55,11 @@ class ParcelStatusWebSocketHandler(
         val payload = objectMapper.writeValueAsString(update)
         watching.forEach { session ->
             if (session.isOpen) {
-                runCatching { session.sendMessage(TextMessage(payload)) }
-                    .onFailure { log.warn("Failed to send parcel update", it) }
+                runCatching {
+                    synchronized(session) {
+                        session.sendMessage(TextMessage(payload))
+                    }
+                }.onFailure { log.warn("Failed to send map update to session", it) }
             }
         }
     }

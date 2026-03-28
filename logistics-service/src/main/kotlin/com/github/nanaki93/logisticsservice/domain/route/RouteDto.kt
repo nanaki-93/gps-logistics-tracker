@@ -4,14 +4,9 @@ import com.github.nanaki93.logisticsservice.domain.address.AddressDto
 import com.github.nanaki93.logisticsservice.domain.util.CoordinatesDto
 
 data class RouteDto(
+    val routeUid: String? = null,
     val origin: AddressDto,
     val destination: AddressDto,
-    val waypoints: List<WaypointDto>,
-)
-
-data class RouteInsertDto(
-    val originId: String,
-    val destinationId: String,
     val waypoints: List<WaypointDto>,
 )
 

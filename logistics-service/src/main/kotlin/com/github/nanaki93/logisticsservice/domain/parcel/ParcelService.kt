@@ -4,6 +4,8 @@ import com.github.nanaki93.logisticsservice.domain.address.AddressService
 import com.github.nanaki93.logisticsservice.domain.driver.DriverService
 import com.github.nanaki93.logisticsservice.domain.route.RouteService
 import com.github.nanaki93.logisticsservice.domain.util.toUuid
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -15,21 +17,46 @@ class ParcelService(
     val addressService: AddressService,
     val driverService: DriverService,
 ) {
-    fun create(parcelDto: ParcelInsertDto) {
-        if (!routeService.validate(parcelDto.routeUid.toUuid()) ||
-            !addressService.validate(parcelDto.senderUid.toUuid()) ||
-            !addressService.validate(parcelDto.receiverUid.toUuid())
-        ) {
-            throw IllegalArgumentException("Invalid parcel data")
-        }
+    fun create(parcelDto: ParcelCreateDto) : ParcelDto{
+        val sender = addressService.create(parcelDto.sender)
+        val receiver = addressService.create(parcelDto.receiver)
+        val route = routeService.create(parcelDto.route)
 
-        val parcel = ParcelMapper.toInsertEntity(parcelDto)
+        val parcel =
+            ParcelMapper.toInsertEntity(
+                ParcelCreateDto(
+                    sender = sender,
+                    receiver = receiver,
+                    route = route,
+                    trackingCode = parcelDto.trackingCode
+                ),
+            )
         parcelRepository.save(parcel)
         statusHistoryService.createHistory(parcel)
+        return ParcelMapper.toDto(
+            parcel = parcel,
+            route = route,
+            driver = null,
+            sender = sender,
+            receiver = receiver,
+        )
     }
 
-    fun getAll(): List<ParcelDto> =
-        parcelRepository.findAll().map {
+    fun getAll(pageable : Pageable): Page<ParcelDto> =
+
+        parcelRepository.findAll(pageable).map {
+            ParcelMapper.toDto(
+                parcel = it,
+                route = routeService.getRouteById(it.routeUid),
+                driver = it.driverUid?.let { uid -> driverService.getByUId(uid) },
+                sender = addressService.getByUId(it.senderUid),
+                receiver = addressService.getByUId(it.receiverUid),
+            )
+        }
+    fun getAllByStatus(status: ParcelStatus, pageable: Pageable): Page<ParcelDto> =
+
+
+        parcelRepository.findAllByStatus(status,pageable).map {
             ParcelMapper.toDto(
                 parcel = it,
                 route = routeService.getRouteById(it.routeUid),

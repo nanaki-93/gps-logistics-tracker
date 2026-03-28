@@ -4,6 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.locationtech.jts.geom.Point
 import java.util.UUID
 
 @Entity
@@ -13,7 +14,7 @@ class Address(
     val addressUid: UUID = UUID.randomUUID(),
     val fullName: String,
     @Column(columnDefinition = "geography(POINT,4326)")
-    val coordinates: String,
+    val coordinates: Point,
     val street: String,
     val city: String,
     val postalCode: String,

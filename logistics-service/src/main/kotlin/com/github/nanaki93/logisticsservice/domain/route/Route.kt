@@ -1,5 +1,6 @@
 package com.github.nanaki93.logisticsservice.domain.route
 
+import com.github.nanaki93.logisticsservice.domain.util.CoordinatesDto
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -17,12 +18,11 @@ class Route(
     val destinationUid: UUID,
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    val waypoints: List<Waypoint>,
+    val waypoints: List<Waypoint> = emptyList(),
 )
 
 data class Waypoint(
-    val order: Int,
-    val lng: Double,
-    val lat: Double,
+    val order: Int = 0,
+    val coordinates: CoordinatesDto = CoordinatesDto(0.0, 0.0),
     val label: String? = null,
 )

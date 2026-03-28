@@ -1,44 +1,37 @@
 package com.github.nanaki93.logisticsservice.domain.route
 
-import com.github.nanaki93.logisticsservice.domain.address.AddressMapper
-import com.github.nanaki93.logisticsservice.domain.address.AddressRepository
-import com.github.nanaki93.logisticsservice.domain.util.toUuid
+import com.github.nanaki93.logisticsservice.domain.address.AddressService
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class RouteService(
     val routeRepository: RouteRepository,
-    val addressRepository: AddressRepository,
+    val addressService: AddressService,
 ) {
-    fun create(routeDto: RouteInsertDto) {
-        val origin =
-            addressRepository
-                .findById(
-                    routeDto.originId.toUuid(),
-                ).orElseThrow { IllegalArgumentException("Origin address not found") }
-        val destination =
-            addressRepository
-                .findById(
-                    routeDto.destinationId.toUuid(),
-                ).orElseThrow { IllegalArgumentException("Destination address not found") }
+    fun create(routeDto: RouteDto): RouteDto {
+        val origin = addressService.create(routeDto.origin)
+        val destination = addressService.create(routeDto.destination)
 
         // todo write right check if origin and destination are different
-        if (origin == destination) throw IllegalArgumentException("Origin and destination cannot be the same")
-        routeRepository.save(RouteMapper.toEntity(routeDto))
+        if (origin.coordinates == destination.coordinates) throw IllegalArgumentException("Origin and destination cannot be the same")
+        return routeRepository
+            .save(
+                RouteMapper.toEntity(
+                    RouteDto(
+                        origin = origin,
+                        destination = destination,
+                        waypoints = routeDto.waypoints,
+                    ),
+                ),
+            ).let { RouteMapper.toDto(it, origin, destination) }
     }
-
-    fun validate(routeUid: UUID): Boolean = routeRepository.findById(routeUid).isPresent
 
     fun getRouteById(routeUid: UUID): RouteDto {
         val route = routeRepository.findById(routeUid).orElseThrow { IllegalArgumentException("Route not found") }
-        val origin = addressRepository.findById(route.originUid).orElseThrow { IllegalArgumentException("Origin address not found") }
-        val destination =
-            addressRepository
-                .findById(
-                    route.destinationUid,
-                ).orElseThrow { IllegalArgumentException("Destination address not found") }
-        return RouteMapper.toDto(route, AddressMapper.toDto(origin), AddressMapper.toDto(destination))
+        val origin = addressService.getByUId(route.originUid)
+        val destination = addressService.getByUId(route.destinationUid)
+        return RouteMapper.toDto(route, origin, destination)
     }
 
     fun delete(routeUid: UUID) {

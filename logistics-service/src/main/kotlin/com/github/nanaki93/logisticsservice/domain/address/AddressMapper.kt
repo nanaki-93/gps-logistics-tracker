@@ -1,12 +1,13 @@
 package com.github.nanaki93.logisticsservice.domain.address
 
-import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toCoordinates
+import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toJtsPoint
 import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toCoordinatesDto
 import java.util.UUID
 
 object AddressMapper {
     fun toDto(address: Address): AddressDto =
         AddressDto(
+            addressUid = address.addressUid.toString(),
             fullName = address.fullName,
             coordinates = address.coordinates.toCoordinatesDto(),
             street = address.street,
@@ -23,7 +24,7 @@ object AddressMapper {
         Address(
             addressUid = uid ?: UUID.randomUUID(),
             fullName = addressDto.fullName,
-            coordinates = addressDto.coordinates.toCoordinates(),
+            coordinates = addressDto.coordinates.toJtsPoint(),
             street = addressDto.street,
             city = addressDto.city,
             postalCode = addressDto.postalCode,

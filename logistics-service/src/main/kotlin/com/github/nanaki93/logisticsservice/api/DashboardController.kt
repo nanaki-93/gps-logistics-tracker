@@ -4,10 +4,13 @@ import com.github.nanaki93.logisticsservice.domain.driver.Driver
 import com.github.nanaki93.logisticsservice.domain.driver.DriverDto
 import com.github.nanaki93.logisticsservice.domain.driver.DriverService
 import com.github.nanaki93.logisticsservice.domain.parcel.ParcelAssignDto
+import com.github.nanaki93.logisticsservice.domain.parcel.ParcelCreateDto
 import com.github.nanaki93.logisticsservice.domain.parcel.ParcelDto
-import com.github.nanaki93.logisticsservice.domain.parcel.ParcelInsertDto
 import com.github.nanaki93.logisticsservice.domain.parcel.ParcelService
+import com.github.nanaki93.logisticsservice.domain.parcel.ParcelStatus
 import com.github.nanaki93.logisticsservice.domain.util.toUuid
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -42,11 +45,14 @@ class DashboardController(
 
     @PostMapping("parcel")
     fun insertParcel(
-        @RequestBody parcel: ParcelInsertDto,
+        @RequestBody parcel: ParcelCreateDto,
     ) = parcelService.create(parcel)
 
     @GetMapping("parcels")
-    fun getParcels(): List<ParcelDto> = parcelService.getAll()
+    fun getParcels(pageable: Pageable, status: String?): Page<ParcelDto> {
+        if (status == null) return parcelService.getAll(pageable)
+        return parcelService.getAllByStatus(ParcelStatus.valueOf(status),pageable)
+    }
 
     @GetMapping("parcel/{parcelUid}")
     fun getParcel(
