@@ -17,7 +17,7 @@ class ParcelService(
     val addressService: AddressService,
     val driverService: DriverService,
 ) {
-    fun create(parcelDto: ParcelCreateDto) : ParcelDto{
+    fun create(parcelDto: ParcelCreateDto): ParcelDto {
         val sender = addressService.create(parcelDto.sender)
         val receiver = addressService.create(parcelDto.receiver)
         val route = routeService.create(parcelDto.route)
@@ -28,7 +28,7 @@ class ParcelService(
                     sender = sender,
                     receiver = receiver,
                     route = route,
-                    trackingCode = parcelDto.trackingCode
+                    trackingCode = parcelDto.trackingCode,
                 ),
             )
         parcelRepository.save(parcel)
@@ -42,7 +42,7 @@ class ParcelService(
         )
     }
 
-    fun getAll(pageable : Pageable): Page<ParcelDto> =
+    fun getAll(pageable: Pageable): Page<ParcelDto> =
 
         parcelRepository.findAll(pageable).map {
             ParcelMapper.toDto(
@@ -53,10 +53,13 @@ class ParcelService(
                 receiver = addressService.getByUId(it.receiverUid),
             )
         }
-    fun getAllByStatus(status: ParcelStatus, pageable: Pageable): Page<ParcelDto> =
 
+    fun getAllByStatus(
+        status: ParcelStatus,
+        pageable: Pageable,
+    ): Page<ParcelDto> =
 
-        parcelRepository.findAllByStatus(status,pageable).map {
+        parcelRepository.findAllByStatus(status, pageable).map {
             ParcelMapper.toDto(
                 parcel = it,
                 route = routeService.getRouteById(it.routeUid),

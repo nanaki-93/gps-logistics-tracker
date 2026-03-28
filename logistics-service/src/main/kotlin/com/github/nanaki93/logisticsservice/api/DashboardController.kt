@@ -49,9 +49,12 @@ class DashboardController(
     ) = parcelService.create(parcel)
 
     @GetMapping("parcels")
-    fun getParcels(pageable: Pageable, status: String?): Page<ParcelDto> {
+    fun getParcels(
+        pageable: Pageable,
+        status: String?,
+    ): Page<ParcelDto> {
         if (status == null) return parcelService.getAll(pageable)
-        return parcelService.getAllByStatus(ParcelStatus.valueOf(status),pageable)
+        return parcelService.getAllByStatus(ParcelStatus.valueOf(status), pageable)
     }
 
     @GetMapping("parcel/{parcelUid}")

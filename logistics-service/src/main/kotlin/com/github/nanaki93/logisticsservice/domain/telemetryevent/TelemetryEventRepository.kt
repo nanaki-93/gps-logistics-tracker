@@ -17,6 +17,7 @@ class TelemetryEventRepository(
     private val jdbc: NamedParameterJdbcTemplate,
 ) {
     val log = logger()
+
     fun insert(event: TelemetryEvent) {
         val sql = """
             INSERT INTO telemetry_event 

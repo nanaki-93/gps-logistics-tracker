@@ -24,17 +24,20 @@ object GeographyUtil {
     fun CoordinatesDto.toJtsPoint() = GeoFactory.point(lat, lng)
 
     fun String.toCoordinatesDto() = fromWkt(this)
+
     fun Point.toCoordinatesDto() = CoordinatesDto(lat = y, lng = x)
 
-
-    fun Pair<Double, Double>.toJtsPoint() = toWkt(CoordinatesDto(lat = first,  lng = second))
+    fun Pair<Double, Double>.toJtsPoint() = toWkt(CoordinatesDto(lat = first, lng = second))
 }
 
 object GeoFactory {
     private val geometryFactory = GeometryFactory(PrecisionModel(), 4326)
 
-    fun point(lat: Double, lng: Double): Point {
-      val point=  geometryFactory.createPoint(Coordinate(lng, lat))
+    fun point(
+        lat: Double,
+        lng: Double,
+    ): Point {
+        val point = geometryFactory.createPoint(Coordinate(lng, lat))
         point.srid = 4326
         return point
     }

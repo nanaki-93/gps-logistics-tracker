@@ -1,7 +1,7 @@
 package com.github.nanaki93.logisticsservice.domain.address
 
-import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toJtsPoint
 import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toCoordinatesDto
+import com.github.nanaki93.logisticsservice.domain.util.GeographyUtil.toJtsPoint
 import java.util.UUID
 
 object AddressMapper {

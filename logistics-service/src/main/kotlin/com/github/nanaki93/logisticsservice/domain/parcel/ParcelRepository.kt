@@ -21,6 +21,6 @@ interface ParcelRepository : JpaRepository<Parcel, UUID> {
 
     fun findAllByStatus(
         status: ParcelStatus,
-        pageable: Pageable
+        pageable: Pageable,
     ): Page<Parcel>
 }
