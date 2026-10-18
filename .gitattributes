@@ -1,0 +1,7 @@
+# Treat static HTML/JS demo dashboards and k6 simulation scripts as vendored
+# so GitHub Linguist reports Kotlin and Go as the repository's primary languages.
+*.html linguist-vendored
+*.css linguist-vendored
+*.js linguist-vendored
+logistics-service/gradlew linguist-vendored
+logistics-service/gradlew.bat linguist-vendored
