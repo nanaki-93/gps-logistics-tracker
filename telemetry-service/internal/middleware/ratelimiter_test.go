@@ -144,3 +144,30 @@ func TestRateLimiter_RejectsOversizedBody(t *testing.T) {
 		t.Fatalf("read %d bytes from oversized body, want at most %d", body.bytesRead, maxAllowedRead)
 	}
 }
+
+func TestRateLimiter_LimitsBeforeReadingBody(t *testing.T) {
+	handler := RateLimiter(1)(okHandler())
+
+	req1 := httptest.NewRequest(http.MethodPost, "/api/v1/telemetry", strings.NewReader(`{}`))
+	req1.Header.Set("X-Driver-UID", "driver-limit-before-read")
+	req1.RemoteAddr = "192.0.2.60:10001"
+	rec1 := httptest.NewRecorder()
+	handler.ServeHTTP(rec1, req1)
+	if rec1.Code != http.StatusOK {
+		t.Fatalf("first request: got status %d, want %d", rec1.Code, http.StatusOK)
+	}
+
+	body := &countingReader{remaining: 10 * 1024 * 1024}
+	req2 := httptest.NewRequest(http.MethodPost, "/api/v1/telemetry", body)
+	req2.Header.Set("X-Driver-UID", "driver-limit-before-read")
+	req2.RemoteAddr = "192.0.2.60:10002"
+	rec2 := httptest.NewRecorder()
+	handler.ServeHTTP(rec2, req2)
+
+	if rec2.Code != http.StatusTooManyRequests {
+		t.Fatalf("second request: got status %d, want %d", rec2.Code, http.StatusTooManyRequests)
+	}
+	if body.bytesRead != 0 {
+		t.Fatalf("expected 0 bytes read when rate limited before body read, got %d", body.bytesRead)
+	}
+}

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -99,36 +100,72 @@ func (rl *rateLimiter) evict(now time.Time) {
 	}
 }
 
+func (rl *rateLimiter) allow(key string) bool {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+
+	lb, ok := rl.limiters[key]
+	if !ok {
+		lb = newTokenBucket(rl.rps)
+		rl.limiters[key] = lb
+	}
+	return lb.Allow()
+}
+
+func (rl *rateLimiter) allowExisting(key string) (bool, bool) {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+
+	lb, ok := rl.limiters[key]
+	if !ok {
+		return false, false
+	}
+	return true, lb.Allow()
+}
+
+func (rl *rateLimiter) preBodyRateLimit(r *http.Request) (bool, bool) {
+	if key := strings.TrimSpace(r.Header.Get("X-Driver-UID")); key != "" {
+		return true, rl.allow(key)
+	}
+	return rl.allowExisting(remoteHost(r.RemoteAddr))
+}
+
+func readBoundedBody(w http.ResponseWriter, r *http.Request) ([]byte, bool) {
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			http.Error(w, "request body too large", http.StatusRequestEntityTooLarge)
+			return nil, false
+		}
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return nil, false
+	}
+	r.Body = io.NopCloser(bytes.NewBuffer(body))
+	return body, true
+}
+
 func (rl *rateLimiter) middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Read body to extract driver_uid
-			r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				var maxBytesErr *http.MaxBytesError
-				if errors.As(err, &maxBytesErr) {
-					http.Error(w, "request body too large", http.StatusRequestEntityTooLarge)
+			if handled, allowed := rl.preBodyRateLimit(r); handled {
+				if !allowed {
+					http.Error(w, "rate limit exceeded", http.StatusTooManyRequests)
 					return
 				}
-				http.Error(w, "bad request", http.StatusBadRequest)
+				if _, ok := readBoundedBody(w, r); !ok {
+					return
+				}
+				next.ServeHTTP(w, r)
 				return
 			}
-			// Restore body so the handler can read it again
-			r.Body = io.NopCloser(bytes.NewBuffer(body))
 
-			key := rateLimitKey(r, body)
-
-			rl.mu.Lock()
-			lb, ok := rl.limiters[key]
+			body, ok := readBoundedBody(w, r)
 			if !ok {
-				lb = newTokenBucket(rl.rps)
-				rl.limiters[key] = lb
+				return
 			}
-			allowed := lb.Allow()
-			rl.mu.Unlock()
-
-			if !allowed {
+			if !rl.allow(rateLimitKey(r, body)) {
 				http.Error(w, "rate limit exceeded", http.StatusTooManyRequests)
 				return
 			}
@@ -137,17 +174,24 @@ func (rl *rateLimiter) middleware() func(http.Handler) http.Handler {
 	}
 }
 
+func remoteHost(remoteAddr string) string {
+	if host, _, err := net.SplitHostPort(remoteAddr); err == nil && host != "" {
+		return host
+	}
+	return remoteAddr
+}
+
 func rateLimitKey(r *http.Request, body []byte) string {
+	if key := strings.TrimSpace(r.Header.Get("X-Driver-UID")); key != "" {
+		return key
+	}
 	var payload struct {
 		DriverUID string `json:"driver_uid"`
 	}
 	if err := json.Unmarshal(body, &payload); err == nil && payload.DriverUID != "" {
 		return payload.DriverUID
 	}
-	if host, _, err := net.SplitHostPort(r.RemoteAddr); err == nil && host != "" {
-		return host
-	}
-	return r.RemoteAddr
+	return remoteHost(r.RemoteAddr)
 }
 
 func RateLimiter(rps int) func(http.Handler) http.Handler {
