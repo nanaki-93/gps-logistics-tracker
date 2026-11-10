@@ -171,3 +171,31 @@ func TestRateLimiter_LimitsBeforeReadingBody(t *testing.T) {
 		t.Fatalf("expected 0 bytes read when rate limited before body read, got %d", body.bytesRead)
 	}
 }
+
+func TestRateLimiter_BodyDriverUIDNotShadowedByHostBucket(t *testing.T) {
+	handler := RateLimiter(1)(okHandler())
+
+	req1 := httptest.NewRequest(http.MethodPost, "/api/v1/telemetry", strings.NewReader(`{}`))
+	req1.RemoteAddr = "192.0.2.70:10001"
+	rec1 := httptest.NewRecorder()
+	handler.ServeHTTP(rec1, req1)
+	if rec1.Code != http.StatusOK {
+		t.Fatalf("keyless request: got status %d, want %d", rec1.Code, http.StatusOK)
+	}
+
+	req2 := httptest.NewRequest(http.MethodPost, "/api/v1/telemetry", strings.NewReader(`{"driver_uid":"d1"}`))
+	req2.RemoteAddr = "192.0.2.70:10002"
+	rec2 := httptest.NewRecorder()
+	handler.ServeHTTP(rec2, req2)
+	if rec2.Code != http.StatusOK {
+		t.Fatalf("body driver_uid request after host bucket exists: got status %d, want %d", rec2.Code, http.StatusOK)
+	}
+
+	req3 := httptest.NewRequest(http.MethodPost, "/api/v1/telemetry", strings.NewReader(`{"driver_uid":"d1"}`))
+	req3.RemoteAddr = "192.0.2.70:10003"
+	rec3 := httptest.NewRecorder()
+	handler.ServeHTTP(rec3, req3)
+	if rec3.Code != http.StatusTooManyRequests {
+		t.Fatalf("second request for d1: got status %d, want %d", rec3.Code, http.StatusTooManyRequests)
+	}
+}

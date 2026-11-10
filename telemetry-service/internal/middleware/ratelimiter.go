@@ -112,22 +112,11 @@ func (rl *rateLimiter) allow(key string) bool {
 	return lb.Allow()
 }
 
-func (rl *rateLimiter) allowExisting(key string) (bool, bool) {
-	rl.mu.Lock()
-	defer rl.mu.Unlock()
-
-	lb, ok := rl.limiters[key]
-	if !ok {
-		return false, false
-	}
-	return true, lb.Allow()
-}
-
 func (rl *rateLimiter) preBodyRateLimit(r *http.Request) (bool, bool) {
 	if key := strings.TrimSpace(r.Header.Get("X-Driver-UID")); key != "" {
 		return true, rl.allow(key)
 	}
-	return rl.allowExisting(remoteHost(r.RemoteAddr))
+	return false, false
 }
 
 func readBoundedBody(w http.ResponseWriter, r *http.Request) ([]byte, bool) {
