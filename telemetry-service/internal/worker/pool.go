@@ -9,23 +9,27 @@ import (
 
 	"com.github.nanaki93/telemetry-service/internal/metrics"
 	"com.github.nanaki93/telemetry-service/internal/model"
-	"com.github.nanaki93/telemetry-service/internal/queue"
 )
 
 var ErrChannelFull = errors.New("worker channel is full")
+
+type Publisher interface {
+	Publish(ctx context.Context, event model.GpsEvent) error
+}
 
 type Job struct {
 	Ctx   context.Context
 	Event model.GpsEvent
 }
+
 type Pool struct {
 	jobs        chan Job
 	workerCount int
-	publisher   *queue.Publisher
+	publisher   Publisher
 	wg          sync.WaitGroup
 }
 
-func NewPool(workerCount, bufferSize int, publisher *queue.Publisher) *Pool {
+func NewPool(workerCount, bufferSize int, publisher Publisher) *Pool {
 	p := &Pool{
 		jobs:        make(chan Job, bufferSize),
 		workerCount: workerCount,
