@@ -96,3 +96,51 @@ func TestRateLimiter_EvictsIdleBuckets(t *testing.T) {
 	}
 	runtime.KeepAlive(handler)
 }
+
+type countingReader struct {
+	remaining int64
+	bytesRead int64
+}
+
+func (r *countingReader) Read(p []byte) (int, error) {
+	if r.remaining <= 0 {
+		return 0, io.EOF
+	}
+	n := int64(len(p))
+	if n > r.remaining {
+		n = r.remaining
+	}
+	for i := range int(n) {
+		p[i] = 'a'
+	}
+	r.remaining -= n
+	r.bytesRead += n
+	return int(n), nil
+}
+
+func TestRateLimiter_RejectsOversizedBody(t *testing.T) {
+	nextCalled := false
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		nextCalled = true
+		w.WriteHeader(http.StatusOK)
+	})
+	handler := RateLimiter(10)(next)
+
+	const totalBytes = 10 * 1024 * 1024
+	const maxAllowedRead = 1024 * 1024
+	body := &countingReader{remaining: totalBytes}
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/telemetry", body)
+	req.RemoteAddr = "192.0.2.50:12345"
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusRequestEntityTooLarge {
+		t.Fatalf("got status %d, want %d", rec.Code, http.StatusRequestEntityTooLarge)
+	}
+	if nextCalled {
+		t.Fatal("expected next handler not to be called for oversized body")
+	}
+	if body.bytesRead > maxAllowedRead {
+		t.Fatalf("read %d bytes from oversized body, want at most %d", body.bytesRead, maxAllowedRead)
+	}
+}

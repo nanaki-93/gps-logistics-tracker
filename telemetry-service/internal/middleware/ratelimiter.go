@@ -3,6 +3,7 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 const (
 	defaultBucketTTL       = 1 * time.Second
 	defaultCleanupInterval = 100 * time.Millisecond
+	maxBodyBytes           = 64 * 1024
 )
 
 type tokenBucket struct {
@@ -101,8 +103,14 @@ func (rl *rateLimiter) middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Read body to extract driver_uid
+			r.Body = http.MaxBytesReader(w, r.Body, maxBodyBytes)
 			body, err := io.ReadAll(r.Body)
 			if err != nil {
+				var maxBytesErr *http.MaxBytesError
+				if errors.As(err, &maxBytesErr) {
+					http.Error(w, "request body too large", http.StatusRequestEntityTooLarge)
+					return
+				}
 				http.Error(w, "bad request", http.StatusBadRequest)
 				return
 			}
