@@ -21,6 +21,9 @@ func TestPostGISComposeDoesNotForceAMD64Platform(t *testing.T) {
 	if strings.Contains(section, "platform: linux/amd64") {
 		t.Fatalf("logistics-db forces linux/amd64 emulation:\n%s", section)
 	}
+	if !strings.Contains(section, "${POSTGIS_IMAGE:-postgis/postgis:15-3.3}") {
+		t.Fatalf("logistics-db does not parameterize POSTGIS_IMAGE:\n%s", section)
+	}
 }
 
 func TestComposeDoesNotHardcodeCredentialsOrExposeDatastorePorts(t *testing.T) {
@@ -39,27 +42,27 @@ func TestComposeDoesNotHardcodeCredentialsOrExposeDatastorePorts(t *testing.T) {
 		{
 			service:   "logistics-db",
 			forbidden: []string{"POSTGRES_PASSWORD: password", `"5432:5432"`},
-			required:  []string{"${POSTGRES_PASSWORD", `"127.0.0.1:5432:5432"`},
+			required:  []string{"${POSTGRES_PASSWORD:-password}", `"127.0.0.1:5432:5432"`},
 		},
 		{
 			service:   "logistics-cache",
 			forbidden: []string{"--requirepass yourpassword", `"6379:6379"`},
-			required:  []string{"--requirepass ${REDIS_PASSWORD", `"127.0.0.1:6379:6379"`},
+			required:  []string{"--requirepass ${REDIS_PASSWORD:-yourpassword}", `"127.0.0.1:6379:6379"`},
 		},
 		{
 			service:   "telemetry-mw-rabbitmq",
 			forbidden: []string{"RABBITMQ_DEFAULT_PASS: password", `"5672:5672"`},
-			required:  []string{"${RABBITMQ_PASSWORD", `"127.0.0.1:5672:5672"`},
+			required:  []string{"${RABBITMQ_PASSWORD:-password}", `"127.0.0.1:5672:5672"`},
 		},
 		{
 			service:   "telemetry-service",
-			forbidden: []string{"admin:password@", "key-truck-001", "key-truck-002"},
-			required:  []string{"${RABBITMQ_PASSWORD", "${API_KEYS"},
+			forbidden: []string{"admin:password@", "API_KEYS: key-truck-001,key-truck-002"},
+			required:  []string{"${RABBITMQ_PASSWORD:-password}", "${API_KEYS:-key-truck-001,key-truck-002}"},
 		},
 		{
 			service:   "logistics-service",
 			forbidden: []string{"POSTGRES_PASSWORD: password", "RABBITMQ_PASSWORD: password"},
-			required:  []string{"${POSTGRES_PASSWORD", "${RABBITMQ_PASSWORD", "${REDIS_PASSWORD"},
+			required:  []string{"${POSTGRES_PASSWORD:-password}", "${RABBITMQ_PASSWORD:-password}", "${REDIS_PASSWORD:-yourpassword}"},
 		},
 	}
 
