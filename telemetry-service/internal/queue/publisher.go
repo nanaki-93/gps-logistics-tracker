@@ -10,9 +10,18 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+type amqpChannel interface {
+	PublishWithContext(ctx context.Context, exchange, key string, mandatory, immediate bool, msg amqp.Publishing) error
+	Close() error
+}
+
+type amqpConnection interface {
+	Close() error
+}
+
 type Publisher struct {
-	conn         *amqp.Connection
-	channel      *amqp.Channel
+	conn         amqpConnection
+	channel      amqpChannel
 	exchangeName string
 	routingKey   string
 }
@@ -88,11 +97,15 @@ func (p *Publisher) Publish(ctx context.Context, event model.GpsEvent) error {
 }
 
 func (p *Publisher) Close() error {
-	if err := p.channel.Close(); err != nil {
-		return fmt.Errorf("failed to close channel: %v", err)
+	if p.channel != nil {
+		if err := p.channel.Close(); err != nil {
+			return fmt.Errorf("failed to close channel: %v", err)
+		}
 	}
-	if err := p.conn.Close(); err != nil {
-		return fmt.Errorf("failed to close connection: %v", err)
+	if p.conn != nil {
+		if err := p.conn.Close(); err != nil {
+			return fmt.Errorf("failed to close connection: %v", err)
+		}
 	}
 	return nil
 }
