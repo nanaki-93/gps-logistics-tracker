@@ -57,7 +57,7 @@ class RabbitMQConfig(
         QueueBuilder
             .durable(rabbitProps.queue)
             .withArgument("x-dead-letter-exchange", "")
-            .withArgument("x-dead-letter-routing-key", rabbitProps.routingKey)
+            .withArgument("x-dead-letter-routing-key", rabbitProps.dlq)
             .build()
 
     @Bean
