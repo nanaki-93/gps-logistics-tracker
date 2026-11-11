@@ -3,11 +3,11 @@ services:
     image: postgis/postgis:15-3.3
     container_name: logistics-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: logistics
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-logistics}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
 
@@ -15,8 +15,8 @@ services:
     image: redis:7.2.6-alpine
     container_name: logistics-cache
     ports:
-      - "6379:6379"
-    command: redis-server --save 20 1 --loglevel warning --requirepass yourpassword
+      - "127.0.0.1:6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
         - cache-data:/data
 
@@ -25,11 +25,11 @@ services:
     container_name: telemetry-mw-rabbitmq
     restart: always
     ports:
-      - "5672:5672"
+      - "127.0.0.1:5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}
     configs:
       - source: rabbitmq-plugins
         target: /etc/rabbitmq/enabled_plugins
@@ -89,13 +89,13 @@ services:
       - "8090:8090"
     environment:
       PORT: 8090
-      RABBITMQ_URL: amqp://admin:password@telemetry-mw-rabbitmq:5672/
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}@telemetry-mw-rabbitmq:5672/
       RABBITMQ_EXCHANGE: telemetry.exchange
       RABBITMQ_ROUTING_KEY: telemetry.#
       WORKER_COUNT: 10
       CHANNEL_BUFFER: 1000
       RATE_LIMIT_RPS: 50
-      API_KEYS: key-truck-001,key-truck-002
+      API_KEYS: ${API_KEYS:?API_KEYS is required}
       OTEL_COLLECTOR_URL: jaeger:4317
 
     restart: unless-stopped
@@ -119,14 +119,15 @@ services:
     environment:
       POSTGRES_HOST: logistics-db
       POSTGRES_PORT: 5432
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      RABBITMQ_USER: admin
-      RABBITMQ_PASSWORD: password
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      RABBITMQ_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}
       RABBITMQ_HOST: telemetry-mw-rabbitmq
       RABBITMQ_PORT: 5672
       REDIS_HOST: logistics-cache
       REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
       OTEL_COLLECTOR_HOST: jaeger
 
     restart: unless-stopped
