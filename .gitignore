@@ -406,3 +406,4 @@ certs/
 # Local development overrides
 docker-compose.local.yml
 docker-compose.dev.yml
+.idea/
